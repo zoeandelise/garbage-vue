@@ -56,6 +56,7 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
+          v-hasPermi="['garbage:record:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -93,12 +94,14 @@
             type="text"
             icon="el-icon-view"
             @click="handleView(scope.row)"
+            v-hasPermi="['garbage:record:query']"
           >查看</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
+            v-hasPermi="['garbage:record:edit']"
             v-if="scope.row.status === '1'"
           >审核</el-button>
         </template>

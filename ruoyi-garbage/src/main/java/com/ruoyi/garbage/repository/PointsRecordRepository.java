@@ -1,5 +1,6 @@
 package com.ruoyi.garbage.repository;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import com.ruoyi.garbage.domain.PointsRecord;
 
 /**
- * 积分记录仓库接口
+ * 积分记录数据访问层
  * 
  * @author ruoyi
  */
@@ -26,6 +27,42 @@ public interface PointsRecordRepository extends MongoRepository<PointsRecord, St
     List<PointsRecord> findByUserId(Long userId);
     
     /**
+     * 根据用户ID和时间范围查询积分记录
+     * 
+     * @param userId 用户ID
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return 积分记录列表
+     */
+    List<PointsRecord> findByUserIdAndCreateTimeBetween(Long userId, Date startTime, Date endTime);
+    
+    /**
+     * 根据用户ID和积分类型查询积分记录
+     * 
+     * @param userId 用户ID
+     * @param type 积分类型
+     * @return 积分记录列表
+     */
+    List<PointsRecord> findByUserIdAndType(Long userId, Integer type);
+    
+    /**
+     * 根据用户ID和积分来源查询积分记录
+     * 
+     * @param userId 用户ID
+     * @param source 积分来源
+     * @return 积分记录列表
+     */
+    List<PointsRecord> findByUserIdAndSource(Long userId, Integer source);
+    
+    /**
+     * 根据用户名称模糊查询积分记录
+     * 
+     * @param userName 用户名称
+     * @return 积分记录列表
+     */
+    List<PointsRecord> findByUserNameLike(String userName);
+    
+    /**
      * 根据用户ID分页查询积分记录
      * 
      * @param userId 用户ID
@@ -37,16 +74,16 @@ public interface PointsRecordRepository extends MongoRepository<PointsRecord, St
     /**
      * 根据积分类型查询积分记录
      * 
-     * @param pointsType 积分类型
+     * @param type 积分类型
      * @return 积分记录列表
      */
-    List<PointsRecord> findByPointsType(Integer pointsType);
+    List<PointsRecord> findByType(Integer type);
     
     /**
-     * 根据关联记录ID查询积分记录
+     * 根据业务ID查询积分记录
      * 
-     * @param referenceId 关联记录ID
+     * @param businessId 业务ID
      * @return 积分记录
      */
-    PointsRecord findByReferenceId(String referenceId);
+    PointsRecord findByBusinessId(String businessId);
 }

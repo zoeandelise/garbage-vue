@@ -47,6 +47,9 @@ user:
 
 # Spring配置
 spring:
+  # 允许Bean定义覆盖
+  main:
+    allow-bean-definition-overriding: true
   # 资源信息
   messages:
     # 国际化资源文件路径
@@ -108,6 +111,13 @@ spring:
     publisher-confirm-type: correlated
     # 开启发送失败退回
     publisher-returns: true
+    # 设置连接超时
+    connection-timeout: 15000
+    # 设置TCP连接恢复
+    connection-recovery:
+      enabled: true
+    # 设置通道超时
+    channel-rpc-timeout: 10000
     listener:
       simple:
         # 手动确认消息
@@ -118,13 +128,25 @@ spring:
         auto-startup: true
         # 消费者最小数量
         concurrency: 1
-        # 消费者最大数量
-        max-concurrency: 10
-        # 重试次数
+        # 消费者最大数量（减少以避免并发问题）
+        max-concurrency: 3
+        # 每个队列的消费者数量限制
+        consumers-per-queue: 1
+        # 重试配置
         retry:
           enabled: true
+          # 最大重试次数
           max-attempts: 3
-          initial-interval: 2000
+          # 初始重试间隔（毫秒）
+          initial-interval: 3000
+          # 重试间隔乘数
+          multiplier: 2
+          # 最大重试间隔（毫秒）
+          max-interval: 10000
+          # 是否使用无限重试
+          infinite: false
+        # 默认不重新入队被拒绝的消息
+        default-requeue-rejected: false
 
 # token配置
 token:

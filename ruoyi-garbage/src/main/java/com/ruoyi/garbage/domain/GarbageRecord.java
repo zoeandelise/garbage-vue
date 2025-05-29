@@ -59,6 +59,22 @@ public class GarbageRecord {
     /** 积分是否已计算 */
     @Field("points_calculated")
     private Boolean pointsCalculated;
+    
+    /** 是否已验证 */
+    @Field("verified")
+    private Boolean verified;
+    
+    /** 审核人ID */
+    @Field("auditor_id")
+    private Long auditorId;
+    
+    /** 审核人名称 */
+    @Field("auditor_name")
+    private String auditorName;
+    
+    /** 审核备注 */
+    @Field("audit_remarks")
+    private String auditRemarks;
 
     /** 创建时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -156,6 +172,38 @@ public class GarbageRecord {
 
     public void setPointsCalculated(Boolean pointsCalculated) {
         this.pointsCalculated = pointsCalculated;
+    }
+    
+    public Boolean getVerified() {
+        return verified;
+    }
+
+    public void setVerified(Boolean verified) {
+        this.verified = verified;
+    }
+
+    public Long getAuditorId() {
+        return auditorId;
+    }
+
+    public void setAuditorId(Long auditorId) {
+        this.auditorId = auditorId;
+    }
+
+    public String getAuditorName() {
+        return auditorName;
+    }
+
+    public void setAuditorName(String auditorName) {
+        this.auditorName = auditorName;
+    }
+
+    public String getAuditRemarks() {
+        return auditRemarks;
+    }
+
+    public void setAuditRemarks(String auditRemarks) {
+        this.auditRemarks = auditRemarks;
     }
 
     public Date getCreateTime() {

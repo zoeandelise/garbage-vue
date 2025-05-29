@@ -32,7 +32,22 @@ const permission = {
     // 生成路由
     GenerateRoutes({ commit }) {
       return new Promise(resolve => {
-        // 向后端请求路由数据
+        // 使用前端定义的路由，而不是从后端请求
+        const asyncRoutes = filterDynamicRoutes(dynamicRoutes);
+        const sidebarRoutes = JSON.parse(JSON.stringify(dynamicRoutes));
+        const rewriteRoutes = JSON.parse(JSON.stringify(dynamicRoutes));
+        
+        rewriteRoutes.push({ path: '*', redirect: '/404', hidden: true });
+        router.addRoutes(asyncRoutes);
+        
+        commit('SET_ROUTES', rewriteRoutes);
+        commit('SET_SIDEBAR_ROUTERS', constantRoutes.concat(sidebarRoutes));
+        commit('SET_DEFAULT_ROUTES', sidebarRoutes);
+        commit('SET_TOPBAR_ROUTES', sidebarRoutes);
+        resolve(rewriteRoutes);
+        
+        // 注释掉原来从后端获取路由的代码
+        /*
         getRouters().then(res => {
           const sdata = JSON.parse(JSON.stringify(res.data))
           const rdata = JSON.parse(JSON.stringify(res.data))
@@ -47,6 +62,7 @@ const permission = {
           commit('SET_TOPBAR_ROUTES', sidebarRoutes)
           resolve(rewriteRoutes)
         })
+        */
       })
     }
   }
@@ -105,6 +121,9 @@ export function filterDynamicRoutes(routes) {
       if (auth.hasRoleOr(route.roles)) {
         res.push(route)
       }
+    } else {
+      // 如果没有设置权限，默认可访问
+      res.push(route)
     }
   })
   return res

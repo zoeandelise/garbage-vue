@@ -1,53 +1,62 @@
 package com.ruoyi.garbage.domain;
 
-import java.util.Date;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.index.Indexed;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.io.Serializable;
+import java.util.Date;
 
 /**
- * 积分记录实体
+ * 积分记录实体类
  * 
  * @author ruoyi
  */
 @Document(collection = "points_record")
-public class PointsRecord {
+public class PointsRecord implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     /** 记录ID */
     @Id
     private String id;
 
     /** 用户ID */
+    @Indexed
     @Field("user_id")
     private Long userId;
 
-    /** 用户名 */
+    /** 用户名称 */
     @Field("user_name")
     private String userName;
 
-    /** 积分变动 */
-    @Field("points_change")
-    private Integer pointsChange;
+    /** 积分变动数量 */
+    @Field("points")
+    private Integer points;
 
-    /** 积分类型（1：获取，2：消费） */
-    @Field("points_type")
-    private Integer pointsType;
+    /** 积分变动类型（1:增加 2:减少） */
+    @Field("type")
+    private Integer type;
 
-    /** 关联记录ID */
-    @Field("reference_id")
-    private String referenceId;
+    /** 积分来源（1:垃圾投递 2:管理员调整 3:积分兑换） */
+    @Field("source")
+    private Integer source;
+
+    /** 相关业务ID（如垃圾投递记录ID） */
+    @Field("business_id")
+    private String businessId;
 
     /** 备注 */
     @Field("remark")
     private String remark;
 
     /** 创建时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Field("create_time")
     private Date createTime;
+
+    /** 创建者 */
+    @Field("create_by")
+    private String createBy;
 
     public String getId() {
         return id;
@@ -73,28 +82,36 @@ public class PointsRecord {
         this.userName = userName;
     }
 
-    public Integer getPointsChange() {
-        return pointsChange;
+    public Integer getPoints() {
+        return points;
     }
 
-    public void setPointsChange(Integer pointsChange) {
-        this.pointsChange = pointsChange;
+    public void setPoints(Integer points) {
+        this.points = points;
     }
 
-    public Integer getPointsType() {
-        return pointsType;
+    public Integer getType() {
+        return type;
     }
 
-    public void setPointsType(Integer pointsType) {
-        this.pointsType = pointsType;
+    public void setType(Integer type) {
+        this.type = type;
     }
 
-    public String getReferenceId() {
-        return referenceId;
+    public Integer getSource() {
+        return source;
     }
 
-    public void setReferenceId(String referenceId) {
-        this.referenceId = referenceId;
+    public void setSource(Integer source) {
+        this.source = source;
+    }
+
+    public String getBusinessId() {
+        return businessId;
+    }
+
+    public void setBusinessId(String businessId) {
+        this.businessId = businessId;
     }
 
     public String getRemark() {
@@ -111,5 +128,29 @@ public class PointsRecord {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getCreateBy() {
+        return createBy;
+    }
+
+    public void setCreateBy(String createBy) {
+        this.createBy = createBy;
+    }
+
+    @Override
+    public String toString() {
+        return "PointsRecord{" +
+                "id='" + id + '\'' +
+                ", userId=" + userId +
+                ", userName='" + userName + '\'' +
+                ", points=" + points +
+                ", type=" + type +
+                ", source=" + source +
+                ", businessId='" + businessId + '\'' +
+                ", remark='" + remark + '\'' +
+                ", createTime=" + createTime +
+                ", createBy='" + createBy + '\'' +
+                '}';
     }
 } 

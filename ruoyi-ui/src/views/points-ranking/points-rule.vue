@@ -181,7 +181,11 @@ export default {
       getPointsRule().then(response => {
         if (response.code === 200) {
           this.form = response.data;
+        } else {
+          this.$modal.msgError("获取积分规则失败");
         }
+      }).catch(() => {
+        this.$modal.msgError("获取积分规则失败，请联系管理员");
       });
     },
     /** 提交按钮 */
@@ -189,7 +193,13 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           updatePointsRule(this.form).then(response => {
-            this.$modal.msgSuccess("保存成功");
+            if (response.code === 200) {
+              this.$modal.msgSuccess("保存成功");
+            } else {
+              this.$modal.msgError(response.msg || "保存失败");
+            }
+          }).catch(() => {
+            this.$modal.msgError("保存失败，请联系管理员");
           });
         }
       });

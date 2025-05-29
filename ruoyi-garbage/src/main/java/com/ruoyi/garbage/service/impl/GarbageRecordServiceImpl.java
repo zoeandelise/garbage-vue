@@ -4,7 +4,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
+import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.core.MessagePropertiesBuilder;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +30,8 @@ import com.ruoyi.garbage.service.IGarbageRecordService;
  */
 @Service
 public class GarbageRecordServiceImpl implements IGarbageRecordService {
+
+    private static final Logger log = LoggerFactory.getLogger(GarbageRecordServiceImpl.class);
 
     @Autowired
     private GarbageRecordRepository garbageRecordRepository;
@@ -43,11 +52,19 @@ public class GarbageRecordServiceImpl implements IGarbageRecordService {
         // 保存记录
         GarbageRecord savedRecord = garbageRecordRepository.save(record);
         
-        // 发送消息到RabbitMQ，异步计算积分
-        rabbitTemplate.convertAndSend(
-                RabbitMQConfig.POINTS_CALCULATION_EXCHANGE,
-                RabbitMQConfig.POINTS_CALCULATION_ROUTING_KEY,
-                savedRecord.getId());
+        try {
+            // 发送消息到RabbitMQ，异步计算积分
+            // 使用消息对象而不是直接发送ID字符串，避免类型转换问题
+            String recordId = savedRecord.getId();
+            log.info("发送积分计算消息，记录ID: {}", recordId);
+            
+            rabbitTemplate.convertAndSend(
+                    RabbitMQConfig.POINTS_CALCULATION_EXCHANGE,
+                    RabbitMQConfig.POINTS_CALCULATION_ROUTING_KEY,
+                    recordId);
+        } catch (Exception e) {
+            log.error("发送积分计算消息失败: {}", e.getMessage(), e);
+        }
         
         return savedRecord;
     }

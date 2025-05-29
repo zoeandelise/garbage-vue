@@ -174,7 +174,7 @@
 </template>
 
 <script>
-import { getUserRanking, getUserDetail } from "@/api/points/ranking";
+import { listRanking, getUserDetail } from "@/api/points/ranking";
 
 export default {
   name: "RankingList",
@@ -215,7 +215,7 @@ export default {
     /** 查询排行榜列表 */
     getList() {
       this.loading = true;
-      getUserRanking(this.queryParams).then(response => {
+      listRanking(this.queryParams).then(response => {
         this.rankingList = response.rows;
         this.total = response.total;
         this.loading = false;

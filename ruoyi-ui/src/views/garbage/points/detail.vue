@@ -8,23 +8,23 @@
       <el-descriptions :column="2" border>
         <el-descriptions-item label="用户名">{{ points.userName }}</el-descriptions-item>
         <el-descriptions-item label="积分变动">
-          <span :style="{ color: points.pointsType === 1 ? '#67C23A' : '#F56C6C' }">
-            {{ points.pointsType === 1 ? '+' : '-' }}{{ points.pointsChange }}
+          <span :style="{ color: points.type === 1 ? '#67C23A' : '#F56C6C' }">
+            {{ points.type === 1 ? '+' : '-' }}{{ points.points }}
           </span>
         </el-descriptions-item>
         <el-descriptions-item label="类型">
-          <el-tag :type="points.pointsType === 1 ? 'success' : 'danger'">
-            {{ points.pointsType === 1 ? '获取' : '消费' }}
+          <el-tag :type="points.type === 1 ? 'success' : 'danger'">
+            {{ points.type === 1 ? '增加' : '减少' }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="关联记录">{{ points.referenceId }}</el-descriptions-item>
+        <el-descriptions-item label="关联记录">{{ points.businessId }}</el-descriptions-item>
         <el-descriptions-item label="说明" :span="2">{{ points.remark }}</el-descriptions-item>
         <el-descriptions-item label="创建者">{{ points.createBy }}</el-descriptions-item>
         <el-descriptions-item label="创建时间">{{ points.createTime }}</el-descriptions-item>
       </el-descriptions>
       
       <!-- 如果是获取积分，显示关联的垃圾投递记录 -->
-      <div v-if="points.pointsType === 1 && points.referenceRecord" class="related-record">
+      <div v-if="points.type === 1 && points.referenceRecord" class="related-record">
         <h4>关联垃圾投递记录</h4>
         <el-descriptions :column="2" border>
           <el-descriptions-item label="垃圾类型">
@@ -55,9 +55,9 @@ export default {
         id: null,
         userId: null,
         userName: null,
-        pointsType: null,
-        pointsChange: null,
-        referenceId: null,
+        type: null,
+        points: null,
+        businessId: null,
         remark: null,
         createBy: null,
         createTime: null,
@@ -95,7 +95,7 @@ export default {
     },
     // 返回列表页
     goBack() {
-      this.$router.push({ path: "/garbage/points" });
+      this.$router.push({ path: "/garbage/points/record" });
     }
   }
 };

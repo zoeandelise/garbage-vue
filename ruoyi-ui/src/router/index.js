@@ -162,141 +162,198 @@ export const dynamicRoutes = [
       }
     ]
   },
-  // 用户管理
+  
+  // 垃圾分类管理
   {
-    path: '/user-management',
+    path: '/garbage',
     component: Layout,
     redirect: 'noredirect',
-    name: 'UserManagement',
-    meta: { title: '用户管理', icon: 'user' },
+    name: 'GarbageManagement',
+    meta: { title: '垃圾分类管理', icon: 'tree', permissions: ['garbage:manage'] },
     children: [
       {
-        path: 'user-list',
-        component: () => import('@/views/user-management/user-list'),
-        name: 'UserList',
-        meta: { title: '用户列表', icon: 'list' }
-      }
-    ]
-  },
-  // 积分管理
-  {
-    path: '/points-management',
-    component: Layout,
-    redirect: 'noredirect',
-    name: 'PointsManagement',
-    meta: { title: '积分管理', icon: 'money' },
-    children: [
-      {
-        path: 'points-list',
-        component: () => import('@/views/points-management/points-list'),
-        name: 'PointsList',
-        meta: { title: '积分查询', icon: 'search' }
+        path: 'record',
+        component: () => import('@/views/garbage/record/index'),
+        name: 'GarbageRecord',
+        meta: { title: '垃圾投递记录', icon: 'form', permissions: ['garbage:record:list'] }
       },
       {
-        path: 'points-edit',
-        component: () => import('@/views/points-management/points-edit'),
-        name: 'PointsEdit',
-        meta: { title: '积分调整', icon: 'edit' }
-      }
-    ]
-  },
-  // 垃圾投递管理
-  {
-    path: '/garbage-record',
-    component: Layout,
-    redirect: 'noredirect',
-    name: 'GarbageRecord',
-    meta: { title: '垃圾投递管理', icon: 'form' },
-    children: [
+        path: 'record/detail/:id',
+        component: () => import('@/views/garbage/record/detail'),
+        name: 'RecordDetail',
+        meta: { title: '记录详情', activeMenu: '/garbage/record', permissions: ['garbage:record:query'] },
+        hidden: true
+      },
       {
-        path: 'record-list',
-        component: () => import('@/views/garbage-record/record-list'),
-        name: 'RecordList',
-        meta: { title: '投递记录查询', icon: 'search' }
+        path: 'record/submit',
+        component: () => import('@/views/garbage/record/submit'),
+        name: 'SubmitRecord',
+        meta: { title: '提交投递记录', icon: 'upload', permissions: ['garbage:record:add'] }
       },
       {
         path: 'image-audit',
         component: () => import('@/views/garbage/record/image-audit'),
         name: 'ImageAudit',
-        meta: { title: '图片审核', icon: 'picture' }
-      }
-    ]
-  },
-  // 分类指南管理
-  {
-    path: '/garbage-guide',
-    component: Layout,
-    redirect: 'noredirect',
-    name: 'GarbageGuide',
-    meta: { title: '分类指南管理', icon: 'guide' },
-    children: [
+        meta: { title: '图片审核', icon: 'picture', permissions: ['garbage:record:audit'] }
+      },
       {
-        path: 'guide-list',
-        component: () => import('@/views/garbage-guide/guide-list'),
-        name: 'GuideList',
-        meta: { title: '分类信息列表', icon: 'list' }
+        path: 'guide',
+        component: () => import('@/views/garbage/guide/index'),
+        name: 'GarbageGuide',
+        meta: { title: '垃圾分类管理', icon: 'guide', permissions: ['garbage:guide:list'] }
+      },
+      {
+        path: 'guide/search',
+        component: () => import('@/views/garbage/guide/search'),
+        name: 'GuideSearch',
+        meta: { title: '垃圾分类查询', icon: 'search', permissions: ['garbage:guide:search'] }
       },
       {
         path: 'guide/add',
         component: () => import('@/views/garbage/guide/add'),
         name: 'GuideAdd',
-        meta: { title: '添加分类指南', activeMenu: '/garbage-guide/guide-list' },
+        meta: { title: '添加分类指南', activeMenu: '/garbage/guide', permissions: ['garbage:guide:add'] },
         hidden: true
       },
       {
         path: 'guide/edit/:id',
         component: () => import('@/views/garbage/guide/edit'),
         name: 'GuideEdit',
-        meta: { title: '编辑分类指南', activeMenu: '/garbage-guide/guide-list' },
+        meta: { title: '编辑分类指南', activeMenu: '/garbage/guide', permissions: ['garbage:guide:edit'] },
         hidden: true
       },
       {
         path: 'guide/detail/:id',
         component: () => import('@/views/garbage/guide/detail'),
         name: 'GuideDetail',
-        meta: { title: '分类指南详情', activeMenu: '/garbage-guide/guide-list' },
+        meta: { title: '分类指南详情', activeMenu: '/garbage/guide', permissions: ['garbage:guide:query'] },
         hidden: true
-      }
-    ]
-  },
-  // 积分与排行
-  {
-    path: '/points-ranking',
-    component: Layout,
-    redirect: 'noredirect',
-    name: 'PointsRanking',
-    meta: { title: '积分与排行', icon: 'chart' },
-    children: [
-      {
-        path: 'user-ranking',
-        component: () => import('@/views/points-ranking/ranking-list'),
-        name: 'UserRanking',
-        meta: { title: '用户积分榜', icon: 'peoples' }
       },
       {
-        path: 'points-rule',
-        component: () => import('@/views/points-ranking/points-rule'),
-        name: 'PointsRule',
-        meta: { title: '积分规则配置', icon: 'edit' }
+        path: 'statistics',
+        component: () => import('@/views/garbage/statistics/index'),
+        name: 'GarbageStatistics',
+        meta: { title: '垃圾分类统计', icon: 'chart', permissions: ['garbage:statistics:view'] }
       }
     ]
   },
-  // 消息队列监控
+  
+  // 积分管理
   {
-    path: '/mq-monitor',
+    path: '/points',
     component: Layout,
     redirect: 'noredirect',
-    name: 'MQMonitor',
-    meta: { title: '消息队列监控', icon: 'monitor' },
+    name: 'PointsManagement',
+    meta: { title: '积分管理', icon: 'money', permissions: ['points:manage'] },
     children: [
       {
-        path: 'queue-status',
-        component: () => import('@/views/mq-monitor/monitor'),
-        name: 'QueueStatus',
-        meta: { title: '队列状态', icon: 'dashboard' }
+        path: 'list',
+        component: () => import('@/views/points-management/points-list'),
+        name: 'PointsList',
+        meta: { title: '积分查询', icon: 'search', permissions: ['points:list'] }
+      },
+      {
+        path: 'edit',
+        component: () => import('@/views/points-management/points-edit'),
+        name: 'PointsEdit',
+        meta: { title: '积分调整', icon: 'edit', permissions: ['points:edit'] }
+      },
+      {
+        path: 'ranking',
+        component: () => import('@/views/points-management/points-ranking'),
+        name: 'PointsRanking',
+        meta: { title: '积分排行榜', icon: 'chart', permissions: ['points:ranking:list'] }
+      },
+      {
+        path: 'rule',
+        component: () => import('@/views/points-ranking/points-rule'),
+        name: 'PointsRule',
+        meta: { title: '积分规则配置', icon: 'edit', permissions: ['points:rule:edit'] }
       }
     ]
   },
+  
+  // 用户中心
+  {
+    path: '/user-center',
+    component: Layout,
+    redirect: 'noredirect',
+    name: 'UserCenter',
+    meta: { title: '用户中心', icon: 'user', permissions: ['user:center:view'] },
+    children: [
+      {
+        path: 'my-record',
+        component: () => import('@/views/garbage/my-record/index'),
+        name: 'MyRecord',
+        meta: { title: '我的投递记录', icon: 'form', permissions: ['user:record:view'] }
+      },
+      {
+        path: 'my-points',
+        component: () => import('@/views/garbage/my-points/index'),
+        name: 'MyPoints',
+        meta: { title: '我的积分', icon: 'money', permissions: ['user:points:view'] }
+      }
+    ]
+  },
+  
+  // 用户管理
+  {
+    path: '/user-management',
+    component: Layout,
+    redirect: 'noredirect',
+    name: 'UserManagement',
+    meta: { title: '用户管理', icon: 'peoples', permissions: ['user:manage'] },
+    children: [
+      {
+        path: 'user-list',
+        component: () => import('@/views/user-management/user-list'),
+        name: 'UserList',
+        meta: { title: '用户列表', icon: 'list', permissions: ['user:list'] }
+      }
+    ]
+  },
+  
+  // 系统监控
+  {
+    path: '/monitor',
+    component: Layout,
+    redirect: 'noredirect',
+    name: 'Monitor',
+    meta: { title: '系统监控', icon: 'monitor', permissions: ['monitor:view'] },
+    children: [
+      {
+        path: 'mq',
+        component: () => import('@/views/mq-monitor/monitor'),
+        name: 'MQMonitor',
+        meta: { title: '消息队列监控', icon: 'message', permissions: ['mq:monitor:view'] }
+      },
+      {
+        path: 'queue-status',
+        component: () => import('@/views/mq-monitor/queue-status'),
+        name: 'QueueStatus',
+        meta: { title: '队列状态', icon: 'dashboard', permissions: ['mq:monitor:view'] }
+      },
+      {
+        path: 'task-log',
+        component: () => import('@/views/mq-monitor/task-log'),
+        name: 'TaskLog',
+        meta: { title: '任务日志', icon: 'log', permissions: ['mq:log:view'] }
+      },
+      {
+        path: 'operlog',
+        component: () => import('@/views/monitor/operlog/index'),
+        name: 'Operlog',
+        meta: { title: '操作日志', icon: 'form', permissions: ['monitor:operlog:list'] }
+      },
+      {
+        path: 'logininfor',
+        component: () => import('@/views/monitor/logininfor/index'),
+        name: 'Logininfor',
+        meta: { title: '登录日志', icon: 'logininfor', permissions: ['monitor:logininfor:list'] }
+      }
+    ]
+  },
+  
   // 系统管理
   {
     path: '/system',
@@ -352,27 +409,6 @@ export const dynamicRoutes = [
         component: () => import('@/views/system/notice/index'),
         name: 'Notice',
         meta: { title: '通知公告', icon: 'message', permissions: ['system:notice:list'] }
-      },
-      {
-        path: 'log',
-        component: Layout,
-        redirect: 'noredirect',
-        name: 'Log',
-        meta: { title: '日志管理', icon: 'log', permissions: ['system:log:list'] },
-        children: [
-          {
-            path: 'operlog',
-            component: () => import('@/views/monitor/operlog/index'),
-            name: 'Operlog',
-            meta: { title: '操作日志', icon: 'form', permissions: ['monitor:operlog:list'] }
-          },
-          {
-            path: 'logininfor',
-            component: () => import('@/views/monitor/logininfor/index'),
-            name: 'Logininfor',
-            meta: { title: '登录日志', icon: 'logininfor', permissions: ['monitor:logininfor:list'] }
-          }
-        ]
       }
     ]
   }

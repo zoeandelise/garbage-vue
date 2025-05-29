@@ -41,31 +41,31 @@
         <span>积分记录</span>
         <el-form :inline="true" style="float: right;">
           <el-form-item label="积分类型">
-            <el-select v-model="queryParams.pointsType" placeholder="全部" clearable size="small" @change="handleQuery">
-              <el-option label="获取积分" value="1"></el-option>
-              <el-option label="消费积分" value="2"></el-option>
+            <el-select v-model="queryParams.type" placeholder="全部" clearable size="small" @change="handleQuery">
+              <el-option label="增加积分" value="1"></el-option>
+              <el-option label="减少积分" value="2"></el-option>
             </el-select>
           </el-form-item>
         </el-form>
       </div>
       <el-table v-loading="loading" :data="pointsList" style="width: 100%">
         <el-table-column prop="createTime" label="时间" width="180" align="center"></el-table-column>
-        <el-table-column prop="pointsChange" label="积分变动" width="100" align="center">
+        <el-table-column prop="points" label="积分变动" width="100" align="center">
           <template slot-scope="scope">
-            <span :style="{ color: scope.row.pointsType === 1 ? '#67C23A' : '#F56C6C' }">
-              {{ scope.row.pointsType === 1 ? '+' : '-' }}{{ scope.row.pointsChange }}
+            <span :style="{ color: scope.row.type === 1 ? '#67C23A' : '#F56C6C' }">
+              {{ scope.row.type === 1 ? '+' : '-' }}{{ scope.row.points }}
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="pointsType" label="类型" width="100" align="center">
+        <el-table-column prop="type" label="类型" width="100" align="center">
           <template slot-scope="scope">
-            <el-tag :type="scope.row.pointsType === 1 ? 'success' : 'danger'">
-              {{ scope.row.pointsType === 1 ? '获取' : '消费' }}
+            <el-tag :type="scope.row.type === 1 ? 'success' : 'danger'">
+              {{ scope.row.type === 1 ? '增加' : '减少' }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="remark" label="说明" align="center"></el-table-column>
-        <el-table-column prop="referenceId" label="关联记录" width="220" align="center" :show-overflow-tooltip="true"></el-table-column>
+        <el-table-column prop="businessId" label="关联记录" width="220" align="center" :show-overflow-tooltip="true"></el-table-column>
       </el-table>
       <pagination
         v-show="total>0"
@@ -97,7 +97,7 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        pointsType: null
+        type: null
       },
       // 消费表单
       consumeForm: {

@@ -8,7 +8,6 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.ruoyi.garbage.constant.GarbageConstants;
@@ -17,6 +16,8 @@ import com.ruoyi.garbage.domain.PointsRecord;
 import com.ruoyi.garbage.repository.GarbageRecordRepository;
 import com.ruoyi.garbage.repository.PointsRecordRepository;
 import com.ruoyi.garbage.service.IPointsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 积分服务实现类
@@ -26,6 +27,8 @@ import com.ruoyi.garbage.service.IPointsService;
 @Service
 public class PointsServiceImpl implements IPointsService {
 
+    private static final Logger log = LoggerFactory.getLogger(PointsServiceImpl.class);
+
     @Autowired
     private PointsRecordRepository pointsRecordRepository;
     
@@ -33,45 +36,60 @@ public class PointsServiceImpl implements IPointsService {
     private GarbageRecordRepository garbageRecordRepository;
 
     @Override
-    @Async
     public PointsRecord calculatePoints(String recordId) {
-        // 查询垃圾投递记录
-        Optional<GarbageRecord> optionalRecord = garbageRecordRepository.findById(recordId);
-        if (!optionalRecord.isPresent()) {
+        try {
+            // 查询垃圾投递记录
+            Optional<GarbageRecord> optionalRecord = garbageRecordRepository.findById(recordId);
+            if (!optionalRecord.isPresent()) {
+                log.error("计算积分失败：找不到垃圾投递记录，ID: {}", recordId);
+                return null;
+            }
+            
+            GarbageRecord record = optionalRecord.get();
+            
+            // 检查是否已计算积分
+            if (Boolean.TRUE.equals(record.getPointsCalculated())) {
+                // 查询已有积分记录
+                PointsRecord existingRecord = pointsRecordRepository.findByBusinessId(recordId);
+                if (existingRecord != null) {
+                    log.info("积分已计算，返回已有积分记录，用户ID: {}, 积分: {}", existingRecord.getUserId(), existingRecord.getPoints());
+                    return existingRecord;
+                }
+                // 已标记为计算但找不到积分记录，继续计算
+                log.warn("记录已标记为计算积分，但找不到积分记录，将重新计算, ID: {}", recordId);
+            }
+            
+            // 根据垃圾类型计算积分
+            int points = calculatePointsByGarbageType(record.getGarbageType(), record.getWeight());
+            
+            // 创建积分记录
+            PointsRecord pointsRecord = new PointsRecord();
+            pointsRecord.setId(UUID.randomUUID().toString());
+            pointsRecord.setUserId(record.getUserId());
+            pointsRecord.setUserName(record.getUserName());
+            pointsRecord.setPoints(points);
+            pointsRecord.setType(1); // 1表示增加积分
+            pointsRecord.setSource(1); // 1表示垃圾投递
+            pointsRecord.setBusinessId(recordId);
+            pointsRecord.setRemark("垃圾投递积分奖励");
+            pointsRecord.setCreateTime(new Date());
+            
+            // 保存积分记录
+            PointsRecord savedRecord = pointsRecordRepository.save(pointsRecord);
+            log.info("成功保存积分记录，用户ID: {}, 积分: {}", savedRecord.getUserId(), savedRecord.getPoints());
+            
+            // 更新垃圾投递记录的积分信息
+            record.setPoints(points);
+            record.setPointsCalculated(true);
+            garbageRecordRepository.save(record);
+            log.info("成功更新垃圾投递记录积分状态，ID: {}", recordId);
+            
+            return savedRecord;
+        } catch (Exception e) {
+            // 记录详细错误信息
+            log.error("积分计算过程中发生异常：{}，记录ID: {}", e.getMessage(), recordId, e);
             return null;
         }
-        
-        GarbageRecord record = optionalRecord.get();
-        
-        // 检查是否已计算积分
-        if (Boolean.TRUE.equals(record.getPointsCalculated())) {
-            // 查询已有积分记录
-            return pointsRecordRepository.findByReferenceId(recordId);
-        }
-        
-        // 根据垃圾类型计算积分
-        int points = calculatePointsByGarbageType(record.getGarbageType(), record.getWeight());
-        
-        // 创建积分记录
-        PointsRecord pointsRecord = new PointsRecord();
-        pointsRecord.setId(UUID.randomUUID().toString());
-        pointsRecord.setUserId(record.getUserId());
-        pointsRecord.setUserName(record.getUserName());
-        pointsRecord.setPointsChange(points);
-        pointsRecord.setPointsType(1); // 1表示获取积分
-        pointsRecord.setReferenceId(recordId);
-        pointsRecord.setRemark("垃圾投递积分奖励");
-        pointsRecord.setCreateTime(new Date());
-        
-        // 保存积分记录
-        PointsRecord savedRecord = pointsRecordRepository.save(pointsRecord);
-        
-        // 更新垃圾投递记录的积分信息
-        record.setPoints(points);
-        record.setPointsCalculated(true);
-        garbageRecordRepository.save(record);
-        
-        return savedRecord;
     }
     
     /**
@@ -144,11 +162,11 @@ public class PointsServiceImpl implements IPointsService {
         // 计算总积分
         int total = 0;
         for (PointsRecord record : records) {
-            // 积分类型：1-获取，2-消费
-            if (record.getPointsType() == 1) {
-                total += record.getPointsChange();
-            } else if (record.getPointsType() == 2) {
-                total -= record.getPointsChange();
+            // 积分类型：1-增加，2-减少
+            if (record.getType() == 1) {
+                total += record.getPoints();
+            } else if (record.getType() == 2) {
+                total -= record.getPoints();
             }
         }
         
@@ -168,8 +186,9 @@ public class PointsServiceImpl implements IPointsService {
         pointsRecord.setId(UUID.randomUUID().toString());
         pointsRecord.setUserId(userId);
         pointsRecord.setUserName(userName);
-        pointsRecord.setPointsChange(points);
-        pointsRecord.setPointsType(2); // 2表示消费积分
+        pointsRecord.setPoints(points);
+        pointsRecord.setType(2); // 2表示减少积分
+        pointsRecord.setSource(3); // 3表示积分兑换
         pointsRecord.setRemark(remark);
         pointsRecord.setCreateTime(new Date());
         

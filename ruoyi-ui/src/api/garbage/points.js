@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 查询积分记录列表
 export function listPoints(query) {
   return request({
-    url: '/garbage/points/list',
+    url: '/garbage/points/record/list',
     method: 'get',
     params: query
   })
@@ -12,7 +12,7 @@ export function listPoints(query) {
 // 查询积分记录详细
 export function getPoints(id) {
   return request({
-    url: '/garbage/points/' + id,
+    url: '/garbage/points/record/' + id,
     method: 'get'
   })
 }

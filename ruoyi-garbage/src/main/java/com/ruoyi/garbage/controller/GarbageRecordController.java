@@ -1,6 +1,11 @@
 package com.ruoyi.garbage.controller;
 
 import java.util.List;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.Base64;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,11 +22,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ruoyi.common.annotation.Anonymous;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.file.FileUtils;
+import com.ruoyi.common.utils.file.FileTypeUtils;
+import com.ruoyi.common.utils.file.MimeTypeUtils;
+import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.garbage.domain.GarbageRecord;
 import com.ruoyi.garbage.service.IGarbageRecordService;
 
@@ -122,5 +133,115 @@ public class GarbageRecordController extends BaseController {
         Long userId = SecurityUtils.getUserId();
         Page<GarbageRecord> page = garbageRecordService.getRecordsByUserId(userId, pageable);
         return AjaxResult.success(page);
+    }
+    
+    /**
+     * 上传垃圾投递照片
+     */
+    @PostMapping("/upload")
+    public AjaxResult uploadPhoto(@RequestBody Map<String, String> data) {
+        try {
+            // 从Base64数据中提取图片内容
+            String photoData = data.get("photoData");
+            if (StringUtils.isEmpty(photoData)) {
+                return AjaxResult.error("未提供照片数据");
+            }
+            
+            // 移除Base64前缀
+            String base64Image = "";
+            if (photoData.contains(",")) {
+                base64Image = photoData.split(",")[1];
+            } else {
+                base64Image = photoData;
+            }
+            
+            // 解码Base64图片
+            byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+            
+            // 生成文件名
+            String extension = "jpg"; // 默认扩展名
+            if (photoData.contains("image/png")) {
+                extension = "png";
+            }
+            String fileName = UUID.randomUUID().toString() + "." + extension;
+            
+            // 获取上传路径
+            String uploadPath = RuoYiConfig.getProfile() + "/garbage-photos/";
+            
+            // 保存文件
+            FileUtils.writeBytes(imageBytes, uploadPath + fileName);
+            
+            // 返回访问URL
+            String url = "/profile/garbage-photos/" + fileName;
+            
+            // 构造返回结果
+            Map<String, Object> result = new HashMap<>();
+            result.put("url", url);
+            result.put("fileName", fileName);
+            
+            return AjaxResult.success(result);
+        } catch (Exception e) {
+            return AjaxResult.error("照片上传失败: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * 审核垃圾投递记录
+     */
+    @PreAuthorize("@ss.hasPermi('garbage:record:audit')")
+    @PostMapping("/audit")
+    public AjaxResult auditRecord(@RequestBody Map<String, Object> params) {
+        String recordId = (String) params.get("recordId");
+        Boolean approved = (Boolean) params.get("approved");
+        String remarks = (String) params.get("remarks");
+        
+        if (StringUtils.isEmpty(recordId) || approved == null) {
+            return AjaxResult.error("记录ID和审核结果不能为空");
+        }
+        
+        GarbageRecord record = garbageRecordService.getRecordById(recordId);
+        if (record == null) {
+            return AjaxResult.error("未找到指定的垃圾投递记录");
+        }
+        
+        // 更新审核状态
+        record.setVerified(approved);
+        record.setAuditRemarks(remarks);
+        record.setAuditorId(SecurityUtils.getUserId());
+        record.setAuditorName(SecurityUtils.getUsername());
+        
+        garbageRecordService.updateRecord(record);
+        
+        return AjaxResult.success();
+    }
+    
+    /**
+     * 批量审核垃圾投递记录
+     */
+    @PreAuthorize("@ss.hasPermi('garbage:record:audit')")
+    @PostMapping("/batchAudit")
+    public AjaxResult batchAudit(@RequestBody Map<String, Object> params) {
+        List<String> recordIds = (List<String>) params.get("recordIds");
+        Boolean approved = (Boolean) params.get("approved");
+        String remarks = (String) params.get("remarks");
+        
+        if (recordIds == null || recordIds.isEmpty() || approved == null) {
+            return AjaxResult.error("记录ID列表和审核结果不能为空");
+        }
+        
+        for (String recordId : recordIds) {
+            GarbageRecord record = garbageRecordService.getRecordById(recordId);
+            if (record != null) {
+                // 更新审核状态
+                record.setVerified(approved);
+                record.setAuditRemarks(remarks);
+                record.setAuditorId(SecurityUtils.getUserId());
+                record.setAuditorName(SecurityUtils.getUsername());
+                
+                garbageRecordService.updateRecord(record);
+            }
+        }
+        
+        return AjaxResult.success();
     }
 }
