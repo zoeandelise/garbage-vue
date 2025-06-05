@@ -1,0 +1,205 @@
+<view class="search-container">
+  <view class="search-head">
+    <view class="search-input">
+      <t-search
+        value="{{value}}"
+        placeholder="{{placeholder}}"
+        bind:change="onChange"
+        bind:clear="onClear"
+        bind:submit="onEnter"
+        focus
+      />
+    </view>
+    <view class="search-btn" bindtap="onBack">取消</view>
+  </view>
+
+  <view class="search-content">
+    <!-- 搜索中 -->
+    <view class="search-loading" wx:if="{{searchStatus === 'searching'}}">
+      <t-loading theme="circular" size="80rpx" />
+      <view class="loading-text">正在搜索...</view>
+    </view>
+
+    <!-- 搜索结果为空 -->
+    <view class="search-empty" wx:elif="{{searchStatus === 'empty' && value}}">
+      <t-empty icon="info-circle-filled" description="没有找到相关结果" />
+      <view class="empty-tips">换个关键词试试吧</view>
+    </view>
+
+    <!-- 搜索失败 -->
+    <view class="search-fail" wx:elif="{{searchStatus === 'fail'}}">
+      <t-empty icon="close-circle" description="搜索失败，请重试" />
+      <view class="retry-button">
+        <t-button theme="primary" size="small" bindtap="onSearch">重新搜索</t-button>
+      </view>
+    </view>
+
+    <!-- 搜索结果列表 -->
+    <view class="search-list" wx:elif="{{searchStatus === 'success' && !showDetail}}" animation="{{animationData}}">
+      <view class="search-result-title">
+        <t-icon name="search" size="36rpx" color="#2a6c3c" />
+        <text>搜索结果</text>
+      </view>
+      <view 
+        class="search-item" 
+        wx:for="{{searchList}}" 
+        wx:key="_id" 
+        data-index="{{index}}" 
+        bindtap="showItemDetail"
+        hover-class="search-item-hover"
+      >
+        <view class="item-category" style="background-color: {{item.categoryColor || '#4CAF50'}}">
+          {{item.categoryName || getCategoryName(item.category)}}
+        </view>
+        <view class="item-info">
+          <view class="item-name">{{item.name}}</view>
+          <view class="item-desc">{{item.detailed_description || item.disposal_method || '点击查看详情'}}</view>
+        </view>
+        <t-icon name="chevron-right" color="#BBBBBB" size="48rpx" />
+      </view>
+    </view>
+    
+    <!-- 详情展示 -->
+    <view class="detail-container" wx:elif="{{showDetail && currentDetail}}" animation="{{animationData}}">
+      <view class="detail-header">
+        <view class="back-icon" bindtap="closeDetail">
+          <t-icon name="chevron-left" size="48rpx" />
+        </view>
+        <view class="detail-title">垃圾详情</view>
+        <view class="placeholder-icon"></view>
+      </view>
+      
+      <!-- 基本信息 -->
+      <view class="basic-info">
+        <view class="item-name-container">
+          <view class="item-name">{{currentDetail.name}}</view>
+          <view class="item-en-name" wx:if="{{currentDetail.enName}}">{{currentDetail.enName}}</view>
+        </view>
+        <view class="category-tag" style="background-color: {{currentDetail.categoryColor || '#4CAF50'}}">
+          <t-icon name="check-circle" size="28rpx" color="#ffffff" />
+          <text>{{currentDetail.categoryName}}</text>
+        </view>
+      </view>
+      
+      <!-- 图片信息 -->
+      <view class="image-container" wx:if="{{currentDetail.imageUrl}}" bindtap="previewImage">
+        <image class="item-image" src="{{currentDetail.imageUrl}}" mode="aspectFill"></image>
+        <view class="image-tip">
+          <t-icon name="zoom-in" size="28rpx" color="#ffffff" />
+          <text>点击查看大图</text>
+        </view>
+      </view>
+      
+      <!-- 详细信息 -->
+      <view class="info-section">
+        <view class="section-title">
+          <t-icon name="info-circle" size="36rpx" color="#2a6c3c" />
+          <text>详细介绍</text>
+        </view>
+        <view class="section-content">{{currentDetail.description || '暂无详细介绍'}}</view>
+      </view>
+      
+      <!-- 投放要求 -->
+      <view class="info-section" wx:if="{{currentDetail.throwingMethod}}">
+        <view class="section-title">
+          <t-icon name="arrow-down" size="36rpx" color="#2a6c3c" />
+          <text>投放要求</text>
+        </view>
+        <view class="section-content">{{currentDetail.throwingMethod}}</view>
+      </view>
+      
+      <!-- 小贴士 -->
+      <view class="info-section" wx:if="{{currentDetail.tips}}">
+        <view class="section-title">
+          <t-icon name="help-circle" size="36rpx" color="#2a6c3c" />
+          <text>小贴士</text>
+        </view>
+        <view class="section-content">{{currentDetail.tips}}</view>
+      </view>
+      
+      <!-- 备注信息 -->
+      <view class="info-section" wx:if="{{currentDetail.remark}}">
+        <view class="section-title">
+          <t-icon name="edit" size="36rpx" color="#2a6c3c" />
+          <text>备注</text>
+        </view>
+        <view class="section-content">{{currentDetail.remark}}</view>
+      </view>
+      
+      <!-- 相关垃圾 -->
+      <view class="info-section" wx:if="{{currentDetail.included_items && currentDetail.included_items.length > 0}}">
+        <view class="section-title">
+          <t-icon name="link" size="36rpx" color="#2a6c3c" />
+          <text>包含物品</text>
+        </view>
+        <view class="related-items">
+          <view class="related-item" wx:for="{{currentDetail.included_items}}" wx:key="*this">
+            <t-icon name="check" size="28rpx" color="#2a6c3c" />
+            <text>{{item}}</text>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 返回按钮 -->
+      <view class="back-button">
+        <t-button theme="primary" size="large" bindtap="closeDetail" icon="chevron-left">返回搜索结果</t-button>
+      </view>
+    </view>
+
+    <!-- 搜索历史和热门搜索 -->
+    <view class="search-history" wx:elif="{{searchStatus === 'empty' && !value}}">
+      <!-- 热门搜索 -->
+      <view class="history-section">
+        <view class="history-header">
+          <view class="history-title">
+            <t-icon name="star" size="36rpx" color="#2a6c3c" />
+            <text>热门搜索</text>
+          </view>
+        </view>
+        <view class="history-tags">
+          <t-tag 
+            class="tag-item" 
+            wx:for="{{popularWords}}" 
+            wx:key="*this" 
+            variant="light"
+            theme="primary" 
+            bindtap="setSearchKeyword" 
+            data-keyword="{{item}}"
+          >
+            {{item}}
+          </t-tag>
+        </view>
+      </view>
+
+      <!-- 搜索历史 -->
+      <view class="history-section" wx:if="{{historyWords.length > 0}}">
+        <view class="history-header">
+          <view class="history-title">
+            <t-icon name="time" size="36rpx" color="#2a6c3c" />
+            <text>搜索历史</text>
+          </view>
+          <view class="history-clear" bindtap="clearAllHistory">清空</view>
+        </view>
+        <view class="history-tags">
+          <view 
+            class="history-item" 
+            wx:for="{{historyWords}}" 
+            wx:key="*this"
+            hover-class="history-item-hover"
+          >
+            <view class="history-keyword" bindtap="onHistoryItemTap" data-keyword="{{item}}">
+              {{item}}
+            </view>
+            <t-icon 
+              name="close" 
+              size="32rpx" 
+              color="#999999" 
+              bindtap="deleteHistory" 
+              data-index="{{index}}" 
+            />
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

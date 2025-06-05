@@ -1,0 +1,95 @@
+<view class="record-container">
+  <nav title-text="垃圾投递记录" />
+  
+  <!-- 未登录提示 -->
+  <view class="login-needed" wx:if="{{!loggedIn}}">
+    <t-empty
+      icon="user-circle"
+      description="登录后可查看您的投递记录"
+    >
+      <t-button slot="action" theme="primary" bindtap="goToLogin">去登录</t-button>
+    </t-empty>
+  </view>
+  
+  <!-- 记录列表 -->
+  <view class="record-content" wx:else>
+    <!-- 统计信息 -->
+    <view class="record-stats">
+      <view class="stats-item">
+        <view class="stats-value">{{totalCount || 0}}</view>
+        <view class="stats-label">投递总数</view>
+      </view>
+    </view>
+    
+    <!-- 加载指示器 -->
+    <view class="loading-container" wx:if="{{loading && recordList.length === 0}}">
+      <t-loading theme="circular" size="80rpx" />
+    </view>
+    
+    <!-- 记录列表 -->
+    <view class="record-list">
+      <view 
+        class="record-item" 
+        wx:for="{{recordList}}" 
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="goToDetail"
+      >
+        <view class="record-info">
+          <view class="record-header">
+            <view class="record-type" style="background-color: {{item.categoryColor || '#4CAF50'}}">
+              {{item.categoryName}}
+            </view>
+            <view class="record-status {{item.status === '已审核' ? 'status-success' : (item.status === '审核中' ? 'status-pending' : 'status-rejected')}}">
+              {{item.status || '审核中'}}
+            </view>
+          </view>
+          <view class="record-detail">
+            <view class="detail-item">
+              <text class="detail-label">投递时间：</text>
+              <text class="detail-value">{{item.createTime}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">重量：</text>
+              <text class="detail-value">{{item.weight || 0}}kg</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">积分：</text>
+              <text class="detail-value">+{{item.points || 0}}</text>
+            </view>
+            <view class="detail-item" wx:if="{{item.remark}}">
+              <text class="detail-label">备注：</text>
+              <text class="detail-value">{{item.remark}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="record-image" wx:if="{{item.imageUrl}}">
+          <image src="{{item.imageUrl}}" mode="aspectFill"></image>
+        </view>
+      </view>
+      
+      <!-- 加载更多 -->
+      <view class="loading-more" wx:if="{{loading && recordList.length > 0}}">
+        <t-loading theme="circular" size="40rpx" />
+        <text class="loading-text">加载中...</text>
+      </view>
+      
+      <!-- 无更多数据 -->
+      <view class="no-more" wx:if="{{!loading && !hasMore && recordList.length > 0}}">
+        <text class="no-more-text">- 没有更多数据了 -</text>
+      </view>
+    </view>
+    
+    <!-- 无数据提示 -->
+    <view class="empty-container" wx:if="{{!loading && (!recordList || recordList.length === 0)}}">
+      <t-empty icon="info-circle-filled" description="暂无投递记录">
+        <t-button slot="action" theme="primary" bindtap="goToUpload">去投递</t-button>
+      </t-empty>
+    </view>
+  </view>
+  
+  <!-- 悬浮按钮 -->
+  <view class="floating-button" bindtap="goToUpload">
+    <t-button theme="primary" icon="add" shape="circle" size="large"></t-button>
+  </view>
+</view> 

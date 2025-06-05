@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "垃圾投递",
+  "usingComponents": {
+    "t-loading": "tdesign-miniprogram/loading/loading",
+    "t-icon": "tdesign-miniprogram/icon/icon",
+    "t-input": "tdesign-miniprogram/input/input",
+    "t-textarea": "tdesign-miniprogram/textarea/textarea",
+    "t-button": "tdesign-miniprogram/button/button",
+    "nav": "../../components/nav/index"
+  }
+} 

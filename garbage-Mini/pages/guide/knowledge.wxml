@@ -1,0 +1,52 @@
+<view class="knowledge-detail-container">
+  <t-navbar title="{{knowledgeDetail.title || '知识详情'}}" />
+  
+  <!-- 加载状态 -->
+  <t-loading theme="circular" size="80rpx" loading="{{loading}}" class="page-loading" />
+  
+  <!-- 错误提示 -->
+  <view wx:if="{{error && !loading}}" class="error-container">
+    <t-icon name="close-circle" size="120rpx" color="#EB4D3D" />
+    <text class="error-message">{{error.message}}</text>
+    <t-button theme="primary" size="small" bindtap="fetchKnowledgeDetail" data-id="{{id}}">重新加载</t-button>
+  </view>
+  
+  <!-- 知识详情 -->
+  <view class="knowledge-detail" wx:if="{{!loading && !error}}">
+    <!-- 标题 -->
+    <view class="detail-header">
+      <text class="detail-title">{{knowledgeDetail.title}}</text>
+      <text class="detail-date">{{knowledgeDetail.createTime}}</text>
+    </view>
+    
+    <!-- 封面图 -->
+    <image 
+      wx:if="{{knowledgeDetail.imageUrl}}"
+      src="{{knowledgeDetail.imageUrl}}" 
+      mode="widthFix" 
+      class="detail-image"
+    ></image>
+    
+    <!-- 内容 -->
+    <view class="detail-content">
+      <!-- 如果内容是HTML格式 -->
+      <rich-text 
+        wx:if="{{knowledgeDetail.content}}" 
+        nodes="{{knowledgeDetail.content}}" 
+        class="rich-content"
+      ></rich-text>
+      
+      <!-- 如果内容是纯文本 -->
+      <text wx:else class="plain-content">{{knowledgeDetail.summary || '暂无详细内容'}}</text>
+    </view>
+    
+    <!-- 底部标签 -->
+    <view class="detail-footer">
+      <t-tag theme="primary" variant="light">垃圾分类知识</t-tag>
+      <t-tag theme="primary" variant="light" wx:if="{{knowledgeDetail.categoryName}}">{{knowledgeDetail.categoryName}}</t-tag>
+    </view>
+  </view>
+  
+  <!-- 底部分享 -->
+  <t-fab icon="share" text="分享" bind:click="onShareAppMessage" wx:if="{{!loading && !error}}" />
+</view> 

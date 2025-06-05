@@ -1,0 +1,52 @@
+<view class="ranking-container">
+  <nav title-text="积分排行榜" left-arrow bind:go-back="goBack" />
+  
+  <!-- 切换排行榜类型 -->
+  <view class="tabs-container">
+    <view class="custom-tabs">
+      <view 
+        wx:for="{{tabs}}" 
+        wx:key="value" 
+        class="tab-item {{rankingType === item.value ? 'active' : ''}}" 
+        data-value="{{item.value}}" 
+        bindtap="onTabChange"
+      >
+        {{item.label}}
+      </view>
+    </view>
+  </view>
+  
+  <!-- 加载指示器 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <t-loading theme="circular" size="80rpx" />
+  </view>
+  
+  <!-- 排行榜列表 -->
+  <view class="ranking-list" wx:elif="{{rankingList && rankingList.length > 0}}">
+    <view class="ranking-header">
+      <view class="rank-column">排名</view>
+      <view class="user-column">用户</view>
+      <view class="points-column">积分</view>
+    </view>
+    
+    <view 
+      class="ranking-item {{index < 3 ? 'top-' + (index + 1) : ''}}" 
+      wx:for="{{rankingList}}" 
+      wx:key="userId"
+    >
+      <view class="rank-column">
+        <view class="rank-number {{index < 3 ? 'top-' + (index + 1) : ''}}">{{index + 1}}</view>
+      </view>
+      <view class="user-column">
+        <image class="user-avatar" src="{{item.avatar || '/static/default-avatar.png'}}" mode="aspectFill"></image>
+        <view class="user-name">{{item.nickname || '用户' + item.userId}}</view>
+      </view>
+      <view class="points-column">{{item.points || 0}}</view>
+    </view>
+  </view>
+  
+  <!-- 无数据提示 -->
+  <view class="empty-container" wx:else>
+    <t-empty icon="info-circle-filled" description="暂无排行榜数据" />
+  </view>
+</view> 

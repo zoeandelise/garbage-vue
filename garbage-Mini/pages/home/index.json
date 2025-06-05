@@ -1,0 +1,17 @@
+{
+  "navigationStyle": "custom",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "t-tabs": "tdesign-miniprogram/tabs/tabs",
+    "t-tab-panel": "tdesign-miniprogram/tab-panel/tab-panel",
+    "t-swiper": "tdesign-miniprogram/swiper/swiper",
+    "t-swiper-nav": "tdesign-miniprogram/swiper-nav/swiper-nav",
+    "t-search": "tdesign-miniprogram/search/search",
+    "t-icon": "tdesign-miniprogram/icon/icon",
+    "t-link": "tdesign-miniprogram/link/link",
+    "t-message": "tdesign-miniprogram/message/message",
+    "t-button": "tdesign-miniprogram/button/button",
+    "t-navbar": "tdesign-miniprogram/navbar/navbar",
+    "nav": "/components/nav"
+  }
+}

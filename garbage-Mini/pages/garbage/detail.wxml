@@ -1,0 +1,96 @@
+<view class="detail-container">
+  <!-- 导航栏 -->
+  <nav title-text="垃圾分类详情" left-arrow bind:go-back="goBack"></nav>
+  
+  <!-- 加载中 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <t-loading theme="circular" size="40rpx" text="加载中..."></t-loading>
+  </view>
+  
+  <!-- 错误提示 -->
+  <view class="error-container" wx:elif="{{error}}">
+    <t-empty icon="error-circle" description="加载失败，请重试"></t-empty>
+  </view>
+  
+  <!-- 详情内容 -->
+  <view class="detail-content" wx:elif="{{detail}}">
+    <!-- 基本信息 -->
+    <view class="info-card">
+      <view class="garbage-name">{{detail.name}}</view>
+      
+      <!-- 分类信息 -->
+      <view class="category-info">
+        <view class="category-tag" style="background-color: {{detail.categoryColor || '#4CAF50'}}">
+          {{detail.categoryName}}
+        </view>
+        <view class="category-desc">{{detail.categoryDescription || ''}}</view>
+      </view>
+      
+      <!-- 图片展示 -->
+      <view class="image-container" wx:if="{{detail.imageUrl}}">
+        <image class="garbage-image" src="{{detail.imageUrl}}" mode="aspectFill" bindtap="previewImage"></image>
+      </view>
+    </view>
+    
+    <!-- 详细描述 -->
+    <view class="desc-card">
+      <view class="card-title">
+        <t-icon name="info-circle" size="40rpx" color="#4CAF50"></t-icon>
+        <text>垃圾详情</text>
+      </view>
+      <view class="card-content">
+        <view class="desc-item">
+          <view class="desc-label">垃圾组成：</view>
+          <view class="desc-value">{{detail.composition || '暂无信息'}}</view>
+        </view>
+        <view class="desc-item">
+          <view class="desc-label">处理方式：</view>
+          <view class="desc-value">{{detail.disposal || '暂无信息'}}</view>
+        </view>
+        <view class="desc-item">
+          <view class="desc-label">危害程度：</view>
+          <view class="desc-value">{{detail.harmLevel || '暂无信息'}}</view>
+        </view>
+        <view class="desc-item">
+          <view class="desc-label">注意事项：</view>
+          <view class="desc-value">{{detail.note || '暂无特殊注意事项'}}</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 投放指南 -->
+    <view class="guide-card">
+      <view class="card-title">
+        <t-icon name="tips" size="40rpx" color="#4CAF50"></t-icon>
+        <text>投放指南</text>
+      </view>
+      <view class="card-content">
+        <view class="guide-item" wx:for="{{detail.guideTips}}" wx:key="index">
+          <view class="guide-dot"></view>
+          <view class="guide-text">{{item}}</view>
+        </view>
+        <view wx:if="{{!detail.guideTips || detail.guideTips.length === 0}}" class="empty-guide">
+          暂无投放指南
+        </view>
+      </view>
+    </view>
+    
+    <!-- 相关垃圾 -->
+    <view class="related-card" wx:if="{{detail.relatedItems && detail.relatedItems.length > 0}}">
+      <view class="card-title">
+        <t-icon name="link" size="40rpx" color="#4CAF50"></t-icon>
+        <text>相关垃圾</text>
+      </view>
+      <view class="related-list">
+        <view class="related-item" 
+              wx:for="{{detail.relatedItems}}" 
+              wx:key="id" 
+              data-id="{{item.id}}"
+              bindtap="navigateToRelated">
+          <text>{{item.name}}</text>
+          <t-icon name="arrow-right" size="32rpx" color="#BBBBBB"></t-icon>
+        </view>
+      </view>
+    </view>
+  </view>
+</view> 

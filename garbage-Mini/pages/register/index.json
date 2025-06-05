@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "用户注册",
+  "usingComponents": {
+    "t-input": "tdesign-miniprogram/input/input",
+    "t-icon": "tdesign-miniprogram/icon/icon",
+    "t-button": "tdesign-miniprogram/button/button",
+    "nav": "../../components/nav/index"
+  }
+} 

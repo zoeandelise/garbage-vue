@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "我的积分",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "t-loading": "tdesign-miniprogram/loading/loading",
+    "t-icon": "tdesign-miniprogram/icon/icon",
+    "t-empty": "tdesign-miniprogram/empty/empty",
+    "nav": "../../components/nav/index"
+  }
+} 

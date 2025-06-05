@@ -1,0 +1,52 @@
+<view class="guide-container">
+  <nav title-text="垃圾分类指南" />
+  
+  <!-- 搜索框 -->
+  <view class="search-box" bindtap="goToSearch">
+    <t-search
+      t-class="t-search"
+      placeholder="搜索垃圾名称，查询分类方式"
+      shape="round"
+      disabled
+    />
+  </view>
+  
+  <!-- 加载指示器 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <t-loading theme="circular" size="80rpx" />
+  </view>
+  
+  <!-- 分类列表 -->
+  <view class="category-list" wx:else>
+    <view 
+      class="category-item" 
+      wx:for="{{categoryList}}" 
+      wx:key="categoryId"
+      data-category="{{item}}"
+      bindtap="goToCategoryDetail"
+    >
+      <view class="category-icon" style="background-color: {{item.categoryColor || '#4CAF50'}}">
+        <text class="category-icon-text">{{item.categoryName[0]}}</text>
+      </view>
+      <view class="category-content">
+        <view class="category-header">
+          <text class="category-name">{{item.categoryName}}</text>
+          <text class="category-code">{{item.categoryCode}}</text>
+        </view>
+        <text class="category-desc">{{item.description || '暂无描述'}}</text>
+        <view class="category-tips">
+          <text class="tips-title">投放要求：</text>
+          <text class="tips-content">{{item.throwingMethod || '暂无投放要求说明'}}</text>
+        </view>
+      </view>
+      <view class="category-arrow">
+        <t-icon name="chevron-right" color="#BBBBBB" size="48rpx" />
+      </view>
+    </view>
+  </view>
+  
+  <!-- 无数据提示 -->
+  <view class="empty-container" wx:if="{{!loading && (!categoryList || categoryList.length === 0)}}">
+    <t-empty icon="info-circle-filled" description="暂无分类数据" />
+  </view>
+</view> 

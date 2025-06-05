@@ -1,0 +1,55 @@
+<view class="points-container">
+  <nav title-text="我的积分" left-arrow bind:go-back="goBack" />
+  
+  <!-- 加载指示器 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <t-loading theme="circular" size="80rpx" />
+  </view>
+  
+  <view class="points-content" wx:else>
+    <!-- 积分卡片 -->
+    <view class="points-card">
+      <view class="points-header">
+        <view class="total-points">{{userPoints.totalPoints || 0}}</view>
+        <view class="points-label">总积分</view>
+      </view>
+      <view class="points-details">
+        <view class="detail-item">
+          <view class="detail-value">{{userPoints.monthPoints || 0}}</view>
+          <view class="detail-label">本月积分</view>
+        </view>
+        <view class="detail-item">
+          <view class="detail-value">{{userPoints.weekPoints || 0}}</view>
+          <view class="detail-label">本周积分</view>
+        </view>
+        <view class="detail-item">
+          <view class="detail-value">{{userPoints.pointsRank || '-'}}</view>
+          <view class="detail-label">当前排名</view>
+        </view>
+      </view>
+      <view class="ranking-btn" bindtap="goToRanking">
+        <text>查看排行榜</text>
+        <t-icon name="chevron-right" color="#BBBBBB" size="40rpx" />
+      </view>
+    </view>
+    
+    <!-- 积分记录 -->
+    <view class="points-history">
+      <view class="history-title">积分记录</view>
+      <view class="history-list" wx:if="{{pointsHistory && pointsHistory.length > 0}}">
+        <view class="history-item" wx:for="{{pointsHistory}}" wx:key="id">
+          <view class="history-info">
+            <view class="history-desc">{{item.description || '积分变动'}}</view>
+            <view class="history-time">{{item.createTime}}</view>
+          </view>
+          <view class="history-points {{item.points > 0 ? 'plus' : 'minus'}}">
+            {{item.points > 0 ? '+' : ''}}{{item.points}}
+          </view>
+        </view>
+      </view>
+      <view class="empty-container" wx:else>
+        <t-empty icon="info-circle-filled" description="暂无积分记录" />
+      </view>
+    </view>
+  </view>
+</view> 

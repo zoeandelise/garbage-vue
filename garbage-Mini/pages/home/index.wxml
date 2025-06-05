@@ -1,0 +1,137 @@
+<nav nav-type="search" />
+<view class="home-container">
+  <t-navbar title-text="城市垃圾分类" />
+  
+  <!-- 加载状态 -->
+  <t-loading theme="circular" size="80rpx" loading="{{loading}}" class="page-loading" />
+  
+  <!-- 错误提示 -->
+  <view wx:if="{{error && !loading}}" class="error-container">
+    <t-icon name="close-circle" size="120rpx" color="#EB4D3D" />
+    <text class="error-message">{{error.message}}</text>
+    <t-button theme="primary" size="small" bindtap="refresh">重新加载</t-button>
+  </view>
+  
+  <!-- 主要内容区域 -->
+  <block wx:if="{{!loading && !error}}">
+    <!-- 搜索框 -->
+    <view class="search-box" bindtap="goToSearch">
+      <t-search
+        t-class="t-search"
+        placeholder="搜索垃圾名称，查询分类方式"
+        shape="round"
+        disabled
+      />
+    </view>
+    
+    <!-- 轮播图 -->
+    <view class="swiper-container">
+      <t-swiper
+        current="{{0}}"
+        autoplay="{{true}}"
+        duration="{{500}}"
+        interval="{{5000}}"
+        navigation="{{ { type: 'dots' } }}"
+        list="{{swiperList}}"
+        image-props="{{ {shape: 'round'} }}"
+      />
+    </view>
+    
+    <!-- 数据统计 -->
+    <view class="statistics">
+      <view class="statistics-item">
+        <view class="statistics-value">{{statistics.totalUsers || 0}}</view>
+        <view class="statistics-label">参与用户</view>
+      </view>
+      <view class="statistics-item">
+        <view class="statistics-value">{{statistics.totalRecords || 0}}</view>
+        <view class="statistics-label">投递总数</view>
+      </view>
+      <view class="statistics-item">
+        <view class="statistics-value">{{statistics.totalWeight || 0}}kg</view>
+        <view class="statistics-label">总重量</view>
+      </view>
+      <view class="statistics-item">
+        <view class="statistics-value">{{statistics.totalPoints || 0}}</view>
+        <view class="statistics-label">总积分</view>
+      </view>
+    </view>
+    
+    <!-- 环保小贴士 -->
+    <view class="eco-tips">
+      <view class="tips-icon">
+        <t-icon name="tips" size="48rpx" color="#2a6c3c" />
+      </view>
+      <view class="tips-content">
+        <text class="tips-title">环保小贴士</text>
+        <view class="tips-text">{{currentTip}}</view>
+      </view>
+    </view>
+    
+    <!-- 快捷入口 -->
+    <view class="quick-actions">
+      <view class="quick-action-item" bindtap="goToSearch">
+        <image src="/static/images/search.png" class="quick-action-icon"></image>
+        <text class="quick-action-text">分类查询</text>
+      </view>
+      <view class="quick-action-item" bindtap="goToUploadRecord">
+        <image src="/static/images/camera.png" class="quick-action-icon"></image>
+        <text class="quick-action-text">拍照投递</text>
+      </view>
+      <view class="quick-action-item" bindtap="navigateTo" data-url="/pages/points/index">
+        <image src="/static/images/points.png" class="quick-action-icon"></image>
+        <text class="quick-action-text">我的积分</text>
+      </view>
+      <view class="quick-action-item" bindtap="navigateTo" data-url="/pages/points/ranking">
+        <image src="/static/images/ranking.png" class="quick-action-icon"></image>
+        <text class="quick-action-text">积分排行</text>
+      </view>
+    </view>
+    
+    <!-- 垃圾分类知识 -->
+    <view class="section-title">
+      <text>垃圾分类知识</text>
+      <t-link theme="primary" size="small" navigateTo url="/pages/guide/knowledge-list" hover>查看更多</t-link>
+    </view>
+    <view class="knowledge-list">
+      <view class="knowledge-item" wx:for="{{knowledgeList}}" wx:key="index" bindtap="goToKnowledge" data-index="{{index}}">
+        <image src="{{item.icon}}" mode="aspectFill" class="knowledge-image"></image>
+        <view class="knowledge-content">
+          <text class="knowledge-title">{{item.title}}</text>
+          <text class="knowledge-desc">{{item.content}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 垃圾分类指南 -->
+    <view class="section-title">
+      <text>垃圾分类指南</text>
+      <t-link theme="primary" size="small" url="/pages/guide/index" hover>查看更多</t-link>
+    </view>
+    <view class="category-list">
+      <view 
+        class="category-item" 
+        wx:for="{{categoryList}}" 
+        wx:key="categoryId"
+        data-category="{{item}}"
+        bindtap="goToCategoryDetail"
+      >
+        <view class="category-icon" style="background-color: {{item.categoryColor || '#4CAF50'}}">
+          <text class="category-icon-text">{{item.categoryName[0]}}</text>
+        </view>
+        <text class="category-name">{{item.categoryName}}</text>
+        <text class="category-desc">{{item.description || '点击查看详情'}}</text>
+      </view>
+    </view>
+  </block>
+</view>
+
+<!-- 悬浮投递按钮 -->
+<view class="home-release" wx:if="{{!loading && !error}}">
+  <t-button theme="primary" size="large" icon="add" shape="round" bindtap="goRelease">
+    投递
+  </t-button>
+</view>
+
+<!-- 全局消息提示 -->
+<t-message id="t-message" />

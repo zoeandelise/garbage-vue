@@ -1,0 +1,71 @@
+<view class="detail-container">
+  <nav title-text="垃圾分类详情" left-arrow bind:go-back="goBack" />
+  
+  <!-- 加载指示器 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <t-loading theme="circular" size="80rpx" />
+  </view>
+  
+  <!-- 错误提示 -->
+  <view class="error-container" wx:elif="{{error}}">
+    <t-icon name="close-circle" size="120rpx" color="#EB4D3D" />
+    <text class="error-message">{{error.message}}</text>
+    <t-button theme="primary" size="small" bindtap="fetchGuideDetail" data-id="{{id}}">重新加载</t-button>
+  </view>
+  
+  <!-- 垃圾详情信息 -->
+  <view class="detail-content" wx:elif="{{guideDetail}}">
+    <!-- 基本信息 -->
+    <view class="basic-info">
+      <view class="item-name">{{guideDetail.name}}</view>
+      <view class="category-tag" style="background-color: {{guideDetail.categoryColor || '#4CAF50'}}">
+        {{guideDetail.categoryName}}
+      </view>
+    </view>
+    
+    <!-- 图片信息 -->
+    <view class="image-container" wx:if="{{guideDetail.imageUrl}}" bindtap="previewImage">
+      <image class="item-image" src="{{guideDetail.imageUrl}}" mode="aspectFill"></image>
+      <view class="image-tip">点击查看大图</view>
+    </view>
+    
+    <!-- 详细信息 -->
+    <view class="info-section">
+      <view class="section-title">详细介绍</view>
+      <view class="section-content">{{guideDetail.description || '暂无详细介绍'}}</view>
+    </view>
+    
+    <!-- 投放要求 -->
+    <view class="info-section" wx:if="{{guideDetail.throwingMethod}}">
+      <view class="section-title">投放要求</view>
+      <view class="section-content">{{guideDetail.throwingMethod}}</view>
+    </view>
+    
+    <!-- 小贴士 -->
+    <view class="info-section" wx:if="{{guideDetail.tips}}">
+      <view class="section-title">小贴士</view>
+      <view class="section-content">{{guideDetail.tips}}</view>
+    </view>
+    
+    <!-- 备注信息 -->
+    <view class="info-section" wx:if="{{guideDetail.remark}}">
+      <view class="section-title">备注</view>
+      <view class="section-content">{{guideDetail.remark}}</view>
+    </view>
+    
+    <!-- 相关垃圾 -->
+    <view class="info-section" wx:if="{{guideDetail.included_items && guideDetail.included_items.length > 0}}">
+      <view class="section-title">包含物品</view>
+      <view class="related-items">
+        <view class="related-item" wx:for="{{guideDetail.included_items}}" wx:key="*this">
+          <text>{{item}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 无数据提示 -->
+  <view class="empty-container" wx:elif="{{!loading && !guideDetail}}">
+    <t-empty icon="info-circle-filled" description="暂无数据" />
+  </view>
+</view> 
