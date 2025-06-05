@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { addGuide } from "@/api/garbage/guide";
+import { addGarbageGuide } from "@/api/garbage/guide";
 
 export default {
   name: "GuideAdd",
@@ -87,9 +87,14 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          addGuide(this.form).then(response => {
+          console.log("提交的表单数据:", this.form); // 打印要提交的数据
+          addGarbageGuide(this.form).then(response => {
+            console.log("新增成功，响应:", response); // 打印响应
             this.$modal.msgSuccess("新增成功");
             this.$router.push({ path: "/garbage/guide" });
+          }).catch(error => {
+            console.error("新增失败:", error); // 打印错误
+            this.$modal.msgError("新增失败: " + (error.message || JSON.stringify(error)));
           });
         }
       });

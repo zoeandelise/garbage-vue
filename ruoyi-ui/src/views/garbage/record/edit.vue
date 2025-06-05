@@ -38,7 +38,7 @@
         </el-row>
         <el-button type="primary" size="mini" @click="getLocation">获取当前位置</el-button>
       </el-form-item>
-      <el-form-item label="照片" prop="photoData">
+      <el-form-item label="照片" prop="photoUrl">
         <el-upload
           class="avatar-uploader"
           action="#"
@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import { getRecord, updateRecord } from "@/api/garbage/record";
+import { getGarbageRecord, updateRecord } from "@/api/garbage/record";
 
 export default {
   name: "RecordEdit",
@@ -83,7 +83,6 @@ export default {
           district: null
         },
         photoUrl: null,
-        photoData: null,
         remark: null,
         points: null,
         pointsCalculated: false
@@ -118,22 +117,31 @@ export default {
   methods: {
     /** 获取垃圾投递记录详细信息 */
     getRecordInfo(id) {
-      getRecord(id).then(response => {
-        this.form = response.data;
-        // 如果没有location对象，创建一个空对象
-        if (!this.form.location) {
-          this.form.location = {
-            longitude: null,
-            latitude: null,
-            address: null,
-            city: null,
-            district: null
-          };
+      getGarbageRecord(id).then(response => {
+        if (response.code === 200 && response.data) {
+          this.form = response.data;
+          // 如果没有location对象，创建一个空对象
+          if (!this.form.location) {
+            this.form.location = {
+              longitude: null,
+              latitude: null,
+              address: null,
+              city: null,
+              district: null
+            };
+          }
+          // 设置图片URL
+          if (this.form.photoUrl) {
+            this.imageUrl = this.getImageUrl(this.form.photoUrl);
+          }
+        } else {
+          this.$modal.msgError("获取记录详情失败");
+          this.cancel();
         }
-        // 设置图片URL
-        if (this.form.photoUrl) {
-          this.imageUrl = this.form.photoUrl;
-        }
+      }).catch(error => {
+        console.error("获取记录详情失败:", error);
+        this.$modal.msgError("获取记录详情失败，请返回重试");
+        this.cancel();
       });
     },
     // 取消按钮
@@ -144,9 +152,25 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
+          const loading = this.$loading({
+            lock: true,
+            text: '保存中...',
+            spinner: 'el-icon-loading',
+            background: 'rgba(0, 0, 0, 0.7)'
+          });
+          
           updateRecord(this.form).then(response => {
-            this.$modal.msgSuccess("修改成功");
-            this.$router.push({ path: "/garbage/record" });
+            loading.close();
+            if (response.code === 200) {
+              this.$modal.msgSuccess("修改成功");
+              this.$router.push({ path: "/garbage/record" });
+            } else {
+              this.$modal.msgError(response.msg || "修改失败");
+            }
+          }).catch(error => {
+            loading.close();
+            console.error("修改记录失败:", error);
+            this.$modal.msgError("修改失败，请重试");
           });
         }
       });
@@ -189,13 +213,50 @@ export default {
     // 自定义上传
     uploadPhoto(options) {
       const file = options.file;
-      // 将图片转为base64
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        this.imageUrl = reader.result;
-        this.form.photoData = reader.result.split(',')[1]; // 去掉base64的前缀
+      uploadPhoto(file).then(response => {
+        if (response.code === 200) {
+          this.imageUrl = process.env.VUE_APP_BASE_API + response.data.url;
+          this.form.photoUrl = response.data.url;
+          this.$message.success("上传成功");
+          options.onSuccess();
+        } else {
+          this.$message.error(response.msg || "上传失败");
+          options.onError();
+        }
+      }).catch(error => {
+        console.error("上传出错", error);
+        this.$message.error("上传过程中发生错误");
+        options.onError();
+      });
+    },
+    // 验证图片URL是否有效
+    isValidImageUrl(url) {
+      if (!url) return false;
+      // 支持相对路径、绝对路径和base64
+      return url.startsWith('http://') || 
+             url.startsWith('https://') || 
+             url.startsWith('/profile/') ||
+             url.startsWith('data:image/');
+    },
+    
+    // 获取图片URL
+    getImageUrl(url) {
+      if (!url) return null;
+      
+      // 如果是完整URL或base64，直接返回
+      if (url.startsWith('http://') || 
+          url.startsWith('https://') ||
+          url.startsWith('data:image/')) {
+        return url;
       }
+      
+      // 如果是相对路径，拼接基础URL
+      if (url.startsWith('/profile/')) {
+        // 根据实际部署情况，可能需要拼接完整域名
+        return process.env.VUE_APP_BASE_API + url;
+      }
+      
+      return null;
     }
   }
 };

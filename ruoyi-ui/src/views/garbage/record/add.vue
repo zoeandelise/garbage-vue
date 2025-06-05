@@ -38,7 +38,7 @@
         </el-row>
         <el-button type="primary" size="mini" @click="getLocation">获取当前位置</el-button>
       </el-form-item>
-      <el-form-item label="照片" prop="photoData">
+      <el-form-item label="照片" prop="photoUrl">
         <el-upload
           class="avatar-uploader"
           action="#"
@@ -82,7 +82,6 @@ export default {
           district: null
         },
         photoUrl: null,
-        photoData: null,
         remark: null
       },
       // 图片URL
@@ -162,13 +161,21 @@ export default {
     // 自定义上传
     uploadPhoto(options) {
       const file = options.file;
-      // 将图片转为base64
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        this.imageUrl = reader.result;
-        this.form.photoData = reader.result.split(',')[1]; // 去掉base64的前缀
-      }
+      uploadPhoto(file).then(response => {
+        if (response.code === 200) {
+          this.imageUrl = process.env.VUE_APP_BASE_API + response.data.url;
+          this.form.photoUrl = response.data.url;
+          this.$message.success("上传成功");
+          options.onSuccess();
+        } else {
+          this.$message.error(response.msg || "上传失败");
+          options.onError();
+        }
+      }).catch(error => {
+        console.error("上传出错", error);
+        this.$message.error("上传过程中发生错误");
+        options.onError();
+      });
     }
   }
 };

@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "垃圾分类详情",
+  "usingComponents": {
+    "t-loading": "tdesign-miniprogram/loading/loading",
+    "t-empty": "tdesign-miniprogram/empty/empty",
+    "nav": "../../components/nav/index"
+  }
+} 

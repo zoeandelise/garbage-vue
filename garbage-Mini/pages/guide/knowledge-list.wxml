@@ -1,0 +1,51 @@
+<view class="knowledge-list-container">
+  <t-navbar title="垃圾分类知识" />
+  
+  <!-- 加载状态 -->
+  <t-loading theme="circular" size="80rpx" loading="{{loading}}" class="page-loading" />
+  
+  <!-- 错误提示 -->
+  <view wx:if="{{error && !loading}}" class="error-container">
+    <t-icon name="close-circle" size="120rpx" color="#EB4D3D" />
+    <text class="error-message">{{error.message}}</text>
+    <t-button theme="primary" size="small" bindtap="fetchKnowledgeList">重新加载</t-button>
+  </view>
+  
+  <!-- 知识列表 -->
+  <view class="knowledge-list" wx:if="{{!loading && !error}}">
+    <view 
+      class="knowledge-item" 
+      wx:for="{{knowledgeList}}" 
+      wx:key="id"
+      bindtap="goToDetail"
+      data-id="{{item.id}}"
+    >
+      <image 
+        src="{{item.imageUrl}}" 
+        mode="aspectFill" 
+        class="knowledge-image"
+        lazy-load
+      ></image>
+      <view class="knowledge-content">
+        <view class="knowledge-header">
+          <text class="knowledge-title">{{item.title}}</text>
+          <text class="knowledge-date">{{item.date}}</text>
+        </view>
+        <text class="knowledge-summary">{{item.summary}}</text>
+        <view class="knowledge-footer">
+          <t-tag theme="primary" variant="light" size="small">分类知识</t-tag>
+          <view class="read-more">
+            <text>查看详情</text>
+            <t-icon name="chevron-right" size="32rpx" />
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && !error && knowledgeList.length === 0}}">
+    <t-icon name="file-text" size="120rpx" color="#CCCCCC" />
+    <text class="empty-text">暂无垃圾分类知识内容</text>
+  </view>
+</view> 

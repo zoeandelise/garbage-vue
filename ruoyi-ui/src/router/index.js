@@ -185,6 +185,13 @@ export const dynamicRoutes = [
         hidden: true
       },
       {
+        path: 'record/edit/:id',
+        component: () => import('@/views/garbage/record/edit'),
+        name: 'RecordEdit',
+        meta: { title: '编辑投递记录', activeMenu: '/garbage/record', permissions: ['garbage:record:edit'] },
+        hidden: true
+      },
+      {
         path: 'record/submit',
         component: () => import('@/views/garbage/record/submit'),
         name: 'SubmitRecord',
@@ -201,12 +208,6 @@ export const dynamicRoutes = [
         component: () => import('@/views/garbage/guide/index'),
         name: 'GarbageGuide',
         meta: { title: '垃圾分类管理', icon: 'guide', permissions: ['garbage:guide:list'] }
-      },
-      {
-        path: 'guide/search',
-        component: () => import('@/views/garbage/guide/search'),
-        name: 'GuideSearch',
-        meta: { title: '垃圾分类查询', icon: 'search', permissions: ['garbage:guide:search'] }
       },
       {
         path: 'guide/add',
@@ -228,6 +229,12 @@ export const dynamicRoutes = [
         name: 'GuideDetail',
         meta: { title: '分类指南详情', activeMenu: '/garbage/guide', permissions: ['garbage:guide:query'] },
         hidden: true
+      },
+      {
+        path: 'search',
+        component: () => import('@/views/garbage/search/index'),
+        name: 'GarbageSearch',
+        meta: { title: '垃圾分类查询', icon: 'search', permissions: ['garbage:guide:search'] }
       },
       {
         path: 'statistics',

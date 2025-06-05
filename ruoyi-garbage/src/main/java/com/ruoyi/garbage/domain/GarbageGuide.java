@@ -1,6 +1,7 @@
 package com.ruoyi.garbage.domain;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -23,16 +24,28 @@ public class GarbageGuide {
 
     /** 垃圾名称 */
     @Indexed
-    @Field("garbage_name")
-    private String garbageName;
+    @Field("name")
+    private String name;
 
     /** 垃圾类型 */
-    @Field("garbage_type")
-    private String garbageType;
+    @Field("category")
+    private String category;
 
     /** 投放建议 */
-    @Field("disposal_tips")
-    private String disposalTips;
+    @Field("disposal_method")
+    private String disposal_method;
+
+    /** 详细描述 */
+    @Field("detailed_description")
+    private String detailed_description;
+
+    /** 小贴士 */
+    @Field("tips")
+    private List<String> tips;
+
+    /** 包含物品 */
+    @Field("included_items")
+    private List<String> included_items;
 
     /** 备注说明 */
     @Field("remark")
@@ -40,7 +53,7 @@ public class GarbageGuide {
 
     /** 图片URL */
     @Field("image_url")
-    private String imageUrl;
+    private String image_url;
 
     /** 创建者 */
     @Field("create_by")
@@ -68,28 +81,52 @@ public class GarbageGuide {
         this.id = id;
     }
 
-    public String getGarbageName() {
-        return garbageName;
+    public String getName() {
+        return name;
     }
 
-    public void setGarbageName(String garbageName) {
-        this.garbageName = garbageName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getGarbageType() {
-        return garbageType;
+    public String getCategory() {
+        return category;
     }
 
-    public void setGarbageType(String garbageType) {
-        this.garbageType = garbageType;
+    public void setCategory(String category) {
+        this.category = category;
     }
 
-    public String getDisposalTips() {
-        return disposalTips;
+    public String getDisposal_method() {
+        return disposal_method;
     }
 
-    public void setDisposalTips(String disposalTips) {
-        this.disposalTips = disposalTips;
+    public void setDisposal_method(String disposal_method) {
+        this.disposal_method = disposal_method;
+    }
+
+    public String getDetailed_description() {
+        return detailed_description;
+    }
+
+    public void setDetailed_description(String detailed_description) {
+        this.detailed_description = detailed_description;
+    }
+
+    public List<String> getTips() {
+        return tips;
+    }
+
+    public void setTips(List<String> tips) {
+        this.tips = tips;
+    }
+
+    public List<String> getIncluded_items() {
+        return included_items;
+    }
+
+    public void setIncluded_items(List<String> included_items) {
+        this.included_items = included_items;
     }
 
     public String getRemark() {
@@ -100,12 +137,12 @@ public class GarbageGuide {
         this.remark = remark;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getImage_url() {
+        return image_url;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImage_url(String image_url) {
+        this.image_url = image_url;
     }
 
     public String getCreateBy() {
@@ -138,5 +175,38 @@ public class GarbageGuide {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    // 兼容旧版本的方法
+    public String getGarbageName() {
+        return name;
+    }
+
+    public void setGarbageName(String garbageName) {
+        this.name = garbageName;
+    }
+
+    public String getGarbageType() {
+        return category;
+    }
+
+    public void setGarbageType(String garbageType) {
+        this.category = garbageType;
+    }
+
+    public String getDisposalTips() {
+        return disposal_method;
+    }
+
+    public void setDisposalTips(String disposalTips) {
+        this.disposal_method = disposalTips;
+    }
+
+    public String getImageUrl() {
+        return image_url;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.image_url = imageUrl;
     }
 } 

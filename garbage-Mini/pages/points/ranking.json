@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "积分排行榜",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "t-loading": "tdesign-miniprogram/loading/loading",
+    "t-empty": "tdesign-miniprogram/empty/empty",
+    "nav": "../../components/nav/index"
+  }
+} 

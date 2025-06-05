@@ -23,6 +23,19 @@
           <el-tag type="warning" v-else>计算中</el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="备注" :span="2">{{ record.remark }}</el-descriptions-item>
+        <el-descriptions-item label="照片">
+          <el-image 
+            v-if="isValidImageUrl(record.photoUrl)"
+            style="width: 100px; height: 100px" 
+            :src="getImageUrl(record.photoUrl)" 
+            :preview-src-list="[getImageUrl(record.photoUrl)]"
+          >
+            <div slot="error" class="image-slot">
+              <i class="el-icon-picture-outline" style="font-size: 30px;"></i>
+            </div>
+          </el-image>
+          <span v-else>无图片</span>
+        </el-descriptions-item>
       </el-descriptions>
       
       <div v-if="record.photoUrl" class="photo-container">
@@ -72,7 +85,6 @@ export default {
           district: null
         },
         photoUrl: null,
-        photoData: null,
         remark: null,
         points: null,
         pointsCalculated: false,
@@ -156,6 +168,34 @@ export default {
     // 返回列表页
     goBack() {
       this.$router.push({ path: "/garbage/record" });
+    },
+    // 验证图片URL是否有效
+    isValidImageUrl(url) {
+      if (!url) return false;
+      // 支持相对路径、绝对路径和base64
+      return url.startsWith('http://') || 
+             url.startsWith('https://') || 
+             url.startsWith('/profile/') ||
+             url.startsWith('data:image/');
+    },
+    // 获取图片URL
+    getImageUrl(url) {
+      if (!url) return null;
+      
+      // 如果是完整URL或base64，直接返回
+      if (url.startsWith('http://') || 
+          url.startsWith('https://') ||
+          url.startsWith('data:image/')) {
+        return url;
+      }
+      
+      // 如果是相对路径，拼接基础URL
+      if (url.startsWith('/profile/')) {
+        // 根据实际部署情况，可能需要拼接完整域名
+        return process.env.VUE_APP_BASE_API + url;
+      }
+      
+      return null;
     }
   }
 };

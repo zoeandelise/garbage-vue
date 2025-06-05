@@ -33,44 +33,44 @@ public interface IGarbageGuideService {
     /**
      * 根据垃圾名称精确查询
      * 
-     * @param garbageName 垃圾名称
+     * @param name 垃圾名称
      * @return 垃圾分类指南
      */
-    GarbageGuide getGuideByGarbageName(String garbageName);
+    GarbageGuide getGuideByName(String name);
     
     /**
      * 根据垃圾名称模糊查询
      * 
-     * @param garbageName 垃圾名称
+     * @param name 垃圾名称
      * @return 垃圾分类指南列表
      */
-    List<GarbageGuide> searchGuidesByGarbageName(String garbageName);
+    List<GarbageGuide> searchGuidesByName(String name);
     
     /**
      * 根据垃圾名称模糊查询（分页）
      * 
-     * @param garbageName 垃圾名称
+     * @param name 垃圾名称
      * @param pageable 分页参数
      * @return 垃圾分类指南分页结果
      */
-    Page<GarbageGuide> searchGuidesByGarbageName(String garbageName, Pageable pageable);
+    Page<GarbageGuide> searchGuidesByName(String name, Pageable pageable);
     
     /**
      * 根据垃圾类型查询
      * 
-     * @param garbageType 垃圾类型
+     * @param category 垃圾类型
      * @return 垃圾分类指南列表
      */
-    List<GarbageGuide> getGuidesByGarbageType(String garbageType);
+    List<GarbageGuide> getGuidesByCategory(String category);
     
     /**
      * 根据垃圾类型查询（分页）
      * 
-     * @param garbageType 垃圾类型
+     * @param category 垃圾类型
      * @param pageable 分页参数
      * @return 垃圾分类指南分页结果
      */
-    Page<GarbageGuide> getGuidesByType(String garbageType, Pageable pageable);
+    Page<GarbageGuide> getGuidesByCategory(String category, Pageable pageable);
     
     /**
      * 查询所有垃圾分类指南
@@ -116,4 +116,46 @@ public interface IGarbageGuideService {
      * @return 垃圾类型列表
      */
     List<String> getAllGarbageTypes();
+    
+    /**
+     * 根据垃圾名称精确查询（兼容旧版本）
+     * 
+     * @param garbageName 垃圾名称
+     * @return 垃圾分类指南
+     */
+    GarbageGuide getGuideByGarbageName(String garbageName);
+    
+    /**
+     * 根据垃圾名称模糊查询（兼容旧版本）
+     * 
+     * @param garbageName 垃圾名称
+     * @return 垃圾分类指南列表
+     */
+    List<GarbageGuide> searchGuidesByGarbageName(String garbageName);
+    
+    /**
+     * 根据垃圾名称模糊查询（分页）（兼容旧版本）
+     * 
+     * @param garbageName 垃圾名称
+     * @param pageable 分页参数
+     * @return 垃圾分类指南分页结果
+     */
+    Page<GarbageGuide> searchGuidesByGarbageName(String garbageName, Pageable pageable);
+    
+    /**
+     * 根据垃圾类型查询（兼容旧版本）
+     * 
+     * @param garbageType 垃圾类型
+     * @return 垃圾分类指南列表
+     */
+    List<GarbageGuide> getGuidesByGarbageType(String garbageType);
+    
+    /**
+     * 根据垃圾类型查询（分页）（兼容旧版本）
+     * 
+     * @param garbageType 垃圾类型
+     * @param pageable 分页参数
+     * @return 垃圾分类指南分页结果
+     */
+    Page<GarbageGuide> getGuidesByType(String garbageType, Pageable pageable);
 } 

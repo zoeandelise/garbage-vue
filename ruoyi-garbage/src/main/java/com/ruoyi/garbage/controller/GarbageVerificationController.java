@@ -32,11 +32,11 @@ public class GarbageVerificationController extends BaseController
     public AjaxResult verifyImage(@RequestBody Map<String, Object> params)
     {
         String garbageType = (String) params.get("garbageType");
-        String photoData = (String) params.get("photoData");
+        String photoUrl = (String) params.get("photoUrl");
         
-        if (StringUtils.isEmpty(garbageType) || StringUtils.isEmpty(photoData))
+        if (StringUtils.isEmpty(garbageType) || StringUtils.isEmpty(photoUrl))
         {
-            return AjaxResult.error("垃圾类型和图片数据不能为空");
+            return AjaxResult.error("垃圾类型和图片URL不能为空");
         }
         
         // 这里可以接入实际的图片识别服务
@@ -68,12 +68,12 @@ public class GarbageVerificationController extends BaseController
     @PostMapping("/identify")
     public AjaxResult identifyGarbageType(@RequestBody Map<String, Object> params)
     {
-        String photoData = (String) params.get("photoData");
+        String photoUrl = (String) params.get("photoUrl");
         String expectedType = (String) params.get("garbageType");
         
-        if (StringUtils.isEmpty(photoData))
+        if (StringUtils.isEmpty(photoUrl))
         {
-            return AjaxResult.error("图片数据不能为空");
+            return AjaxResult.error("图片URL不能为空");
         }
         
         // 这里可以接入实际的AI图片识别服务
@@ -107,11 +107,11 @@ public class GarbageVerificationController extends BaseController
     public AjaxResult compareGarbageTypeWithImage(@RequestBody Map<String, Object> params)
     {
         String garbageType = (String) params.get("garbageType");
-        String photoData = (String) params.get("photoData");
+        String photoUrl = (String) params.get("photoUrl");
         
-        if (StringUtils.isEmpty(garbageType) || StringUtils.isEmpty(photoData))
+        if (StringUtils.isEmpty(garbageType) || StringUtils.isEmpty(photoUrl))
         {
-            return AjaxResult.error("垃圾类型和图片数据不能为空");
+            return AjaxResult.error("垃圾类型和图片URL不能为空");
         }
         
         // 模拟比对过程

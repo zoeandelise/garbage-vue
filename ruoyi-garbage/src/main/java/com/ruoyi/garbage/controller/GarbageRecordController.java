@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Base64;
+import java.io.File;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -139,28 +140,27 @@ public class GarbageRecordController extends BaseController {
      * 上传垃圾投递照片
      */
     @PostMapping("/upload")
-    public AjaxResult uploadPhoto(@RequestBody Map<String, String> data) {
+    public AjaxResult uploadPhoto(@RequestParam("file") MultipartFile file) {
         try {
-            // 从Base64数据中提取图片内容
-            String photoData = data.get("photoData");
-            if (StringUtils.isEmpty(photoData)) {
+            // 检查文件是否为空
+            if (file.isEmpty()) {
                 return AjaxResult.error("未提供照片数据");
             }
             
-            // 移除Base64前缀
-            String base64Image = "";
-            if (photoData.contains(",")) {
-                base64Image = photoData.split(",")[1];
-            } else {
-                base64Image = photoData;
+            // 检查文件类型
+            String contentType = file.getContentType();
+            if (contentType == null || (!contentType.startsWith("image/jpeg") && !contentType.startsWith("image/png"))) {
+                return AjaxResult.error("只能上传JPG/PNG格式的图片");
             }
             
-            // 解码Base64图片
-            byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+            // 检查文件大小
+            if (file.getSize() > 10 * 1024 * 1024) { // 10MB
+                return AjaxResult.error("图片大小不能超过10MB");
+            }
             
             // 生成文件名
-            String extension = "jpg"; // 默认扩展名
-            if (photoData.contains("image/png")) {
+            String extension = "jpg";
+            if (contentType.startsWith("image/png")) {
                 extension = "png";
             }
             String fileName = UUID.randomUUID().toString() + "." + extension;
@@ -169,14 +169,20 @@ public class GarbageRecordController extends BaseController {
             String uploadPath = RuoYiConfig.getProfile() + "/garbage-photos/";
             
             // 保存文件
-            FileUtils.writeBytes(imageBytes, uploadPath + fileName);
+            File dest = new File(uploadPath + fileName);
+            if (!dest.getParentFile().exists()) {
+                dest.getParentFile().mkdirs();
+            }
+            file.transferTo(dest);
             
-            // 返回访问URL
+            // 返回完整的访问URL
             String url = "/profile/garbage-photos/" + fileName;
+            String fullUrl = url; // 如果有域名可以拼接：serverConfig.getUrl() + url
             
             // 构造返回结果
             Map<String, Object> result = new HashMap<>();
             result.put("url", url);
+            result.put("fullUrl", fullUrl);
             result.put("fileName", fileName);
             
             return AjaxResult.success(result);

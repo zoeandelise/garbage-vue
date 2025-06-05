@@ -29,13 +29,14 @@ service.interceptors.request.use(config => {
   if (getToken() && !isToken) {
     config.headers['Authorization'] = 'Bearer ' + getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
   }
-  // get请求映射params参数
+  
+  // 修改get请求参数处理，避免手动拼接URL导致的编码问题
   if (config.method === 'get' && config.params) {
-    let url = config.url + '?' + tansParams(config.params)
-    url = url.slice(0, -1)
-    config.params = {}
-    config.url = url
+    // 不再手动拼接URL，让axios自动处理参数
+    // 这样可以确保参数被正确编码
+    console.log("请求参数:", config.params);
   }
+  
   if (!isRepeatSubmit && (config.method === 'post' || config.method === 'put')) {
     const requestObj = {
       url: config.url,
@@ -82,6 +83,12 @@ service.interceptors.response.use(res => {
       return res.data
     }
     if (code === 401) {
+      // 检查是否设置了errorHandler选项
+      if (res.config.errorHandler) {
+        // 如果设置了errorHandler选项，直接返回错误信息
+        return Promise.resolve({ code: 401, msg: '无效的会话，或者会话已过期，请重新登录。', data: null })
+      }
+      
       if (!isRelogin.show) {
         isRelogin.show = true
         MessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', { confirmButtonText: '重新登录', cancelButtonText: '取消', type: 'warning' }).then(() => {
@@ -95,12 +102,30 @@ service.interceptors.response.use(res => {
     }
       return Promise.reject('无效的会话，或者会话已过期，请重新登录。')
     } else if (code === 500) {
+      // 检查是否设置了errorHandler选项
+      if (res.config.errorHandler) {
+        // 如果设置了errorHandler选项，直接返回错误信息
+        return Promise.resolve({ code: 500, msg: msg, data: null })
+      }
+      
       Message({ message: msg, type: 'error' })
       return Promise.reject(new Error(msg))
     } else if (code === 601) {
+      // 检查是否设置了errorHandler选项
+      if (res.config.errorHandler) {
+        // 如果设置了errorHandler选项，直接返回错误信息
+        return Promise.resolve({ code: 601, msg: msg, data: null })
+      }
+      
       Message({ message: msg, type: 'warning' })
       return Promise.reject('error')
     } else if (code !== 200) {
+      // 检查是否设置了errorHandler选项
+      if (res.config.errorHandler) {
+        // 如果设置了errorHandler选项，直接返回错误信息
+        return Promise.resolve({ code: code, msg: msg, data: null })
+      }
+      
       Notification.error({ title: msg })
       return Promise.reject('error')
     } else {
@@ -117,6 +142,13 @@ service.interceptors.response.use(res => {
     } else if (message.includes("Request failed with status code")) {
       message = "系统接口" + message.substr(message.length - 3) + "异常"
     }
+    
+    // 检查是否设置了errorHandler选项
+    if (error.config && error.config.errorHandler) {
+      // 如果设置了errorHandler选项，直接返回错误信息
+      return Promise.resolve({ code: 500, msg: message, data: null })
+    }
+    
     Message({ message: message, type: 'error', duration: 5 * 1000 })
     return Promise.reject(error)
   }

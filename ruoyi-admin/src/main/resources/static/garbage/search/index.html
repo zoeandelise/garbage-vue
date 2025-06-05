@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>垃圾分类查询</title>
+    <!-- 引入Element UI -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        body {
+            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px 0;
+            background: linear-gradient(135deg, #67b26f 0%, #4ca2cd 100%);
+            border-radius: 8px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .title {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
+        
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .content {
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .result-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .category-tag {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: white;
+        }
+        
+        .category-recyclable {
+            background-color: #1890ff;
+        }
+        
+        .category-hazardous {
+            background-color: #f5222d;
+        }
+        
+        .category-kitchen {
+            background-color: #52c41a;
+        }
+        
+        .category-other {
+            background-color: #8c8c8c;
+        }
+        
+        .result-content {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        
+        .result-image {
+            width: 120px;
+            height: 120px;
+            margin-right: 20px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f5f5f5;
+        }
+        
+        .result-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+        
+        .result-info {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .info-item {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        
+        .tips-list {
+            margin: 5px 0 0 20px;
+            padding-left: 0;
+        }
+        
+        .tips-list li {
+            margin-bottom: 5px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e4e7ed;
+            margin-bottom: 20px;
+        }
+        
+        .tab-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-right: 10px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab-item:hover {
+            color: #409eff;
+        }
+        
+        .tab-item.active {
+            color: #409eff;
+            border-bottom-color: #409eff;
+        }
+        
+        .examples-container, .quiz-container, .common-container {
+            margin-top: 20px;
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .example-card, .quiz-card {
+            border-radius: 8px;
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .example-card:hover, .quiz-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .card-image {
+            width: 100%;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f5f5f5;
+        }
+        
+        .card-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+        
+        .card-content {
+            padding: 15px;
+        }
+        
+        .card-description {
+            font-size: 14px;
+            color: #606266;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .common-items {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .common-tag {
+            margin-right: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
+        .el-tag {
+            margin-right: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+        
+        .loading i {
+            font-size: 40px;
+            color: #409eff;
+        }
+        
+        .loading p {
+            margin-top: 10px;
+            color: #606266;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 30px 0;
+            color: #909399;
+        }
+        
+        .el-tabs__nav {
+            white-space: nowrap;
+            position: relative;
+            transition: transform .3s;
+            float: left;
+        }
+        
+        .el-tabs__item {
+            padding: 0 20px;
+            height: 40px;
+            box-sizing: border-box;
+            line-height: 40px;
+            display: inline-block;
+            list-style: none;
+            font-size: 14px;
+            font-weight: 500;
+            color: #303133;
+            position: relative;
+        }
+        
+        .el-tabs__item.is-active {
+            color: #409eff;
+        }
+        
+        .el-tabs__active-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 2px;
+            background-color: #409eff;
+            z-index: 1;
+            transition: transform .3s cubic-bezier(.645,.045,.355,1);
+            list-style: none;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px 0;
+            }
+            
+            .title {
+                font-size: 24px;
+            }
+            
+            .subtitle {
+                font-size: 14px;
+            }
+            
+            .result-content {
+                flex-direction: column;
+            }
+            
+            .result-image {
+                width: 100%;
+                height: auto;
+                margin-right: 0;
+            }
+            
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <!-- 搜索框部分 -->
+            <div class="header">
+                <h1 class="title">垃圾分类查询</h1>
+                <p class="subtitle">输入垃圾名称，了解正确的分类方式</p>
+                
+                <div class="search-box">
+                    <el-input
+                        v-model="keyword"
+                        placeholder="请输入垃圾名称（如：纸张、塑料瓶、果皮等）"
+                        prefix-icon="el-icon-search"
+                        clearable
+                        @keyup.enter.native="handleSearch"
+                    >
+                        <el-button slot="append" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+                    </el-input>
+                </div>
+            </div>
+            
+            <!-- 搜索结果部分 -->
+            <div v-if="searchResult" class="content">
+                <div class="result-header">
+                    <span class="result-title">{{ searchResult.name }}</span>
+                    <div class="category-tag" :class="getCategoryClass(searchResult.category)">
+                        {{ getCategoryName(searchResult.category) }}
+                    </div>
+                </div>
+                
+                <div class="result-content">
+                    <div class="result-image" v-if="searchResult.image_url">
+                        <img :src="getImageUrl(searchResult.image_url)" alt="垃圾分类图片">
+                    </div>
+                    
+                    <div class="result-info">
+                        <div class="info-item">
+                            <i class="el-icon-s-promotion"></i>
+                            <span class="label">投放建议：</span>
+                            <span>{{ searchResult.disposal_method }}</span>
+                        </div>
+                        
+                        <div class="info-item" v-if="searchResult.detailed_description">
+                            <i class="el-icon-document"></i>
+                            <span class="label">详细描述：</span>
+                            <span>{{ searchResult.detailed_description }}</span>
+                        </div>
+                        
+                        <div class="info-item" v-if="searchResult.tips && searchResult.tips.length > 0">
+                            <i class="el-icon-info"></i>
+                            <span class="label">小贴士：</span>
+                            <ul class="tips-list">
+                                <li v-for="(tip, index) in searchResult.tips" :key="index">{{ tip }}</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="info-item" v-if="searchResult.included_items && searchResult.included_items.length > 0">
+                            <i class="el-icon-collection-tag"></i>
+                            <span class="label">包含物品：</span>
+                            <div>
+                                <el-tag
+                                    v-for="(item, index) in searchResult.included_items"
+                                    :key="index"
+                                    size="small"
+                                    effect="plain"
+                                    @click="searchByName(item)"
+                                >
+                                    {{ item }}
+                                </el-tag>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: right; margin-top: 20px;">
+                    <el-button type="primary" plain icon="el-icon-back" @click="searchResult = null">返回</el-button>
+                    <el-button type="success" plain icon="el-icon-search" @click="handleSearch">重新查询</el-button>
+                </div>
+            </div>
+            
+            <!-- 加载中 -->
+            <div v-else-if="loading.search" class="content">
+                <div class="loading">
+                    <div>
+                        <i class="el-icon-loading"></i>
+                        <p>正在查询中，请稍候...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 无结果提示 -->
+            <div v-else-if="noResult" class="content">
+                <div style="text-align: center; padding: 30px 0;">
+                    <i class="el-icon-warning-outline" style="font-size: 48px; color: #e6a23c;"></i>
+                    <p style="margin-top: 10px; color: #606266;">未找到相关垃圾分类信息</p>
+                    <el-button type="primary" @click="keyword = ''; noResult = false;">重新搜索</el-button>
+                </div>
+            </div>
+            
+            <!-- 垃圾分类指南 -->
+            <div v-else class="content">
+                <!-- 选项卡 -->
+                <div class="tabs">
+                    <div 
+                        class="tab-item" 
+                        :class="{ active: activeTab === 'examples' }" 
+                        @click="switchTab('examples')"
+                    >
+                        分类示例
+                    </div>
+                    <div 
+                        class="tab-item" 
+                        :class="{ active: activeTab === 'common' }" 
+                        @click="switchTab('common')"
+                    >
+                        常见垃圾
+                    </div>
+                    <div 
+                        class="tab-item" 
+                        :class="{ active: activeTab === 'quiz' }" 
+                        @click="switchTab('quiz')"
+                    >
+                        垃圾分类小测验
+                    </div>
+                </div>
+                
+                <!-- 分类示例 -->
+                <div v-if="activeTab === 'examples'" class="examples-container">
+                    <div v-if="loading.examples" class="loading">
+                        <div>
+                            <i class="el-icon-loading"></i>
+                            <p>加载中...</p>
+                        </div>
+                    </div>
+                    
+                    <div v-else-if="exampleItems.length === 0" class="no-data">
+                        <i class="el-icon-warning-outline" style="font-size: 48px; color: #909399;"></i>
+                        <p>暂无分类示例数据</p>
+                    </div>
+                    
+                    <div v-else class="card-grid">
+                        <div v-for="(item, index) in exampleItems" :key="index" class="example-card" @click="searchByName(item.name)">
+                            <div class="card-header">
+                                <div class="card-title">{{ item.name }}</div>
+                            </div>
+                            <div class="card-image" v-if="item.image_url">
+                                <img :src="getImageUrl(item.image_url)" alt="垃圾分类图片">
+                            </div>
+                            <div class="card-content">
+                                <div class="card-description">{{ item.detailed_description }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 常见垃圾 -->
+                <div v-else-if="activeTab === 'common'" class="common-container">
+                    <div v-if="loading.common" class="loading">
+                        <div>
+                            <i class="el-icon-loading"></i>
+                            <p>加载中...</p>
+                        </div>
+                    </div>
+                    
+                    <div v-else>
+                        <el-tabs type="border-card">
+                            <el-tab-pane label="可回收物">
+                                <div class="common-items" v-if="commonItems.recyclable.length > 0">
+                                    <el-tag
+                                        v-for="(item, index) in commonItems.recyclable"
+                                        :key="'recyclable-' + index"
+                                        size="medium"
+                                        effect="plain"
+                                        color="#e6f7ff"
+                                        class="common-tag"
+                                        @click="searchByName(item.name)"
+                                    >
+                                        {{ item.name }}
+                                    </el-tag>
+                                </div>
+                                <div v-else class="no-data">暂无可回收物数据</div>
+                            </el-tab-pane>
+                            
+                            <el-tab-pane label="有害垃圾">
+                                <div class="common-items" v-if="commonItems.hazardous.length > 0">
+                                    <el-tag
+                                        v-for="(item, index) in commonItems.hazardous"
+                                        :key="'hazardous-' + index"
+                                        size="medium"
+                                        effect="plain"
+                                        color="#fff2f0"
+                                        class="common-tag"
+                                        @click="searchByName(item.name)"
+                                    >
+                                        {{ item.name }}
+                                    </el-tag>
+                                </div>
+                                <div v-else class="no-data">暂无有害垃圾数据</div>
+                            </el-tab-pane>
+                            
+                            <el-tab-pane label="厨余垃圾">
+                                <div class="common-items" v-if="commonItems.kitchen.length > 0">
+                                    <el-tag
+                                        v-for="(item, index) in commonItems.kitchen"
+                                        :key="'kitchen-' + index"
+                                        size="medium"
+                                        effect="plain"
+                                        color="#f6ffed"
+                                        class="common-tag"
+                                        @click="searchByName(item.name)"
+                                    >
+                                        {{ item.name }}
+                                    </el-tag>
+                                </div>
+                                <div v-else class="no-data">暂无厨余垃圾数据</div>
+                            </el-tab-pane>
+                            
+                            <el-tab-pane label="其他垃圾">
+                                <div class="common-items" v-if="commonItems.other.length > 0">
+                                    <el-tag
+                                        v-for="(item, index) in commonItems.other"
+                                        :key="'other-' + index"
+                                        size="medium"
+                                        effect="plain"
+                                        color="#f9f9f9"
+                                        class="common-tag"
+                                        @click="searchByName(item.name)"
+                                    >
+                                        {{ item.name }}
+                                    </el-tag>
+                                </div>
+                                <div v-else class="no-data">暂无其他垃圾数据</div>
+                            </el-tab-pane>
+                        </el-tabs>
+                    </div>
+                </div>
+                
+                <!-- 垃圾分类小测验 -->
+                <div v-else-if="activeTab === 'quiz'" class="quiz-container">
+                    <div v-if="loading.quiz" class="loading">
+                        <div>
+                            <i class="el-icon-loading"></i>
+                            <p>加载中...</p>
+                        </div>
+                    </div>
+                    
+                    <div v-else-if="quizItems.length === 0" class="no-data">
+                        <i class="el-icon-warning-outline" style="font-size: 48px; color: #909399;"></i>
+                        <p>暂无测验题目数据</p>
+                    </div>
+                    
+                    <div v-else class="card-grid">
+                        <div v-for="(item, index) in quizItems" :key="index" class="quiz-card" @click="searchByName(item.name)">
+                            <div class="card-header">
+                                <div class="card-title">{{ item.name }}</div>
+                            </div>
+                            <div class="card-image" v-if="item.image_url">
+                                <img :src="getImageUrl(item.image_url)" alt="垃圾分类图片">
+                            </div>
+                            <div class="card-content">
+                                <div class="card-description">{{ item.detailed_description }}</div>
+                                <div v-if="item.tips && item.tips.length > 0">
+                                    <div v-for="(tip, tipIndex) in item.tips" :key="tipIndex" style="margin-top: 8px; color: #909399;">
+                                        <i class="el-icon-info"></i> {{ tip }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 引入Vue和Element UI -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                baseUrl: '', // 基础URL
+                keyword: '',
+                searchResult: null,
+                noResult: false,
+                exampleItems: [],
+                quizItems: [],
+                commonItems: {
+                    recyclable: [],
+                    hazardous: [],
+                    kitchen: [],
+                    other: []
+                },
+                activeTab: 'examples',
+                loading: {
+                    search: false,
+                    examples: false,
+                    quiz: false,
+                    common: false
+                }
+            },
+            created() {
+                // 检测是否需要设置基础URL
+                this.baseUrl = window.location.protocol + '//' + window.location.host;
+                console.log("API基础URL:", this.baseUrl);
+                
+                // 加载分类示例和测验项目
+                this.loadExamples();
+                this.loadQuizItems();
+                this.loadCommonItems();
+            },
+            methods: {
+                // 获取完整的图片URL
+                getImageUrl(url) {
+                    if (!url) return '';
+                    // 如果已经是完整URL，直接返回
+                    if (url.startsWith('http://') || url.startsWith('https://')) {
+                        return url;
+                    }
+                    // 否则拼接基础URL
+                    return this.baseUrl + url;
+                },
+                
+                // 搜索处理
+                handleSearch() {
+                    if (!this.keyword.trim()) {
+                        this.$message({
+                            message: '请输入垃圾名称',
+                            type: 'warning'
+                        });
+                        return;
+                    }
+                    
+                    this.loading.search = true;
+                    this.searchResult = null;
+                    this.noResult = false;
+                    
+                    axios.get(this.baseUrl + '/garbage/search/keyword', {
+                        params: { keyword: this.keyword }
+                    })
+                    .then(response => {
+                        this.loading.search = false;
+                        console.log("搜索响应:", response.data);
+                        
+                        if (response.data && response.data.code === 200) {
+                            const data = response.data.data;
+                            
+                            if (Array.isArray(data) && data.length > 0) {
+                                this.searchResult = data[0]; // 取第一个结果
+                                console.log("处理后的搜索结果:", this.searchResult);
+                            } else if (data && typeof data === 'object' && !Array.isArray(data)) {
+                                this.searchResult = data;
+                                console.log("处理后的搜索结果:", this.searchResult);
+                            } else {
+                                console.warn("未找到匹配结果");
+                                this.noResult = true;
+                            }
+                        } else {
+                            console.warn("API返回错误:", response.data.msg || "未知错误");
+                            this.noResult = true;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('搜索失败:', error);
+                        this.loading.search = false;
+                        this.noResult = true;
+                        
+                        this.$message({
+                            message: '搜索失败，请稍后重试',
+                            type: 'error'
+                        });
+                    });
+                },
+                
+                // 根据垃圾类别获取类名
+                getCategoryClass(category) {
+                    const categoryMap = {
+                        'recyclable': 'category-recyclable',
+                        'hazardous': 'category-hazardous',
+                        'kitchen': 'category-kitchen',
+                        'other': 'category-other'
+                    };
+                    
+                    return categoryMap[category] || '';
+                },
+                
+                // 根据垃圾类别获取类别名称
+                getCategoryName(category) {
+                    const categoryMap = {
+                        'recyclable': '可回收物',
+                        'hazardous': '有害垃圾',
+                        'kitchen': '厨余垃圾',
+                        'other': '其他垃圾',
+                        'example': '分类示例',
+                        'quiz': '测验题目'
+                    };
+                    
+                    return categoryMap[category] || '未知类别';
+                },
+                
+                // 加载分类示例
+                loadExamples() {
+                    this.loading.examples = true;
+                    axios.get(this.baseUrl + '/garbage/search/list', {
+                        params: { category: 'example' }
+                    })
+                    .then(response => {
+                        this.loading.examples = false;
+                        console.log("示例数据:", response.data);
+                        
+                        if (response.data && response.data.code === 200 && response.data.data) {
+                            this.exampleItems = response.data.data;
+                        } else {
+                            console.warn("未获取到示例数据或格式不正确");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("加载示例数据失败:", error);
+                        this.loading.examples = false;
+                    });
+                },
+                
+                // 加载测验项目
+                loadQuizItems() {
+                    this.loading.quiz = true;
+                    axios.get(this.baseUrl + '/garbage/search/list', {
+                        params: { category: 'quiz' }
+                    })
+                    .then(response => {
+                        this.loading.quiz = false;
+                        console.log("测验数据:", response.data);
+                        
+                        if (response.data && response.data.code === 200 && response.data.data) {
+                            this.quizItems = response.data.data;
+                        } else {
+                            console.warn("未获取到测验数据或格式不正确");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("加载测验数据失败:", error);
+                        this.loading.quiz = false;
+                    });
+                },
+                
+                // 加载常见垃圾项目
+                loadCommonItems() {
+                    this.loading.common = true;
+                    
+                    // 使用Promise.all来处理多个请求
+                    const categories = ['recyclable', 'hazardous', 'kitchen', 'other'];
+                    const requests = categories.map(category => {
+                        return axios.get(this.baseUrl + '/garbage/search/list', {
+                            params: { category: category }
+                        })
+                        .then(response => {
+                            console.log(`${this.getCategoryName(category)}数据:`, response.data);
+                            if (response.data && response.data.code === 200 && response.data.data) {
+                                this.commonItems[category] = response.data.data;
+                            } else {
+                                console.warn(`未获取到${this.getCategoryName(category)}数据或格式不正确`);
+                                this.commonItems[category] = [];
+                            }
+                        })
+                        .catch(error => {
+                            console.error(`加载${this.getCategoryName(category)}数据失败:`, error);
+                            this.commonItems[category] = [];
+                        });
+                    });
+                    
+                    // 所有请求完成后设置loading状态为false
+                    Promise.all(requests)
+                        .then(() => {
+                            this.loading.common = false;
+                            console.log("所有常见垃圾数据加载完成");
+                        })
+                        .catch(error => {
+                            console.error("加载常见垃圾数据过程中发生错误:", error);
+                            this.loading.common = false;
+                        });
+                },
+                
+                // 切换标签页
+                switchTab(tab) {
+                    this.activeTab = tab;
+                },
+                
+                // 根据名称搜索
+                searchByName(name) {
+                    this.keyword = name;
+                    this.handleSearch();
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

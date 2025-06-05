@@ -1,0 +1,74 @@
+<view class="upload-container">
+  <nav title-text="垃圾投递" left-arrow bind:go-back="goBack" />
+  
+  <!-- 加载指示器 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <t-loading theme="circular" size="80rpx" />
+  </view>
+  
+  <view class="upload-content" wx:else>
+    <!-- 分类选择 -->
+    <view class="section-title">选择垃圾分类</view>
+    <view class="category-list">
+      <view 
+        class="category-item {{selectedCategory === item.categoryCode ? 'selected' : ''}}" 
+        wx:for="{{categoryList}}" 
+        wx:key="categoryId"
+        data-category="{{item}}"
+        bindtap="selectCategory"
+      >
+        <view class="category-icon" style="background-color: {{item.categoryColor || '#4CAF50'}}">
+          <text class="category-icon-text">{{item.categoryName[0]}}</text>
+        </view>
+        <view class="category-name">{{item.categoryName}}</view>
+      </view>
+    </view>
+    
+    <!-- 图片上传 -->
+    <view class="section-title">上传垃圾照片</view>
+    <view class="image-upload" bindtap="chooseImage">
+      <view class="upload-box" wx:if="{{!tempImagePath}}">
+        <t-icon name="add" size="60rpx" color="#999" />
+        <text class="upload-text">点击上传照片</text>
+      </view>
+      <image wx:else class="preview-image" src="{{tempImagePath}}" mode="aspectFill"></image>
+    </view>
+    
+    <!-- 重量输入 -->
+    <view class="section-title">垃圾重量(kg)</view>
+    <view class="input-box">
+      <t-input
+        placeholder="请输入垃圾重量，单位：kg"
+        value="{{weight}}"
+        type="digit"
+        bindchange="inputWeight"
+      />
+    </view>
+    
+    <!-- 备注信息 -->
+    <view class="section-title">备注信息(选填)</view>
+    <view class="input-box">
+      <t-textarea
+        placeholder="请输入备注信息"
+        value="{{remark}}"
+        maxlength="200"
+        disableDefaultPadding="{{true}}"
+        indicator
+        bindchange="inputRemark"
+      />
+    </view>
+    
+    <!-- 提交按钮 -->
+    <view class="btn-container">
+      <t-button 
+        theme="primary" 
+        size="large" 
+        block 
+        loading="{{uploadLoading}}" 
+        bind:tap="uploadRecord"
+      >
+        提交投递记录
+      </t-button>
+    </view>
+  </view>
+</view> 

@@ -1,0 +1,6 @@
+<t-tab-bar value="{{ value }}" theme="tag" split="{{ false }}" bind:change="handleChange">
+  <t-tab-bar-item icon="home" value="home">首页</t-tab-bar-item>
+  <t-tab-bar-item icon="book-open" value="guide">分类指南</t-tab-bar-item>
+  <t-tab-bar-item icon="layers" value="record">投递记录</t-tab-bar-item>
+  <t-tab-bar-item icon="user" value="my">我的</t-tab-bar-item>
+</t-tab-bar>

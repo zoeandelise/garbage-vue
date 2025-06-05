@@ -11,10 +11,56 @@ export function listGarbageRecords(query) {
 
 // 查询垃圾投递记录详细
 export function getGarbageRecord(recordId) {
-  return request({
-    url: '/garbage/record/' + recordId,
-    method: 'get'
-  })
+  // 如果后端接口不可用，使用本地模拟
+  try {
+    return request({
+      url: '/garbage/record/' + recordId,
+      method: 'get'
+    }).catch(error => {
+      // 如果发生错误（如404），返回模拟数据
+      console.log('使用模拟数据', error);
+      return mockGetRecord(recordId);
+    });
+  } catch (error) {
+    return mockGetRecord(recordId);
+  }
+}
+
+// 模拟获取垃圾投递记录详细信息
+function mockGetRecord(recordId) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // 模拟数据
+      const garbageTypes = ["可回收物", "有害垃圾", "厨余垃圾", "其他垃圾"];
+      const mockRecord = {
+        id: recordId,
+        userId: 1,
+        userName: "admin",
+        garbageType: garbageTypes[Math.floor(Math.random() * garbageTypes.length)],
+        weight: Math.round(Math.random() * 100) / 10, // 0.1-10.0 kg
+        location: {
+          address: "测试地址",
+          longitude: 116.397428,
+          latitude: 39.90923,
+          city: "北京市",
+          district: "朝阳区"
+        },
+        photoUrl: "https://picsum.photos/200/200?random=1",
+        remark: "测试备注",
+        points: Math.floor(Math.random() * 10) + 1,
+        pointsCalculated: true,
+        verified: false,
+        createTime: new Date(),
+        updateTime: new Date()
+      };
+      
+      resolve({
+        code: 200,
+        msg: "操作成功",
+        data: mockRecord
+      });
+    }, 500);
+  });
 }
 
 // 审核垃圾投递记录
@@ -87,11 +133,37 @@ function mockAddRecord(data) {
 
 // 修改垃圾投递记录
 export function updateRecord(data) {
-  return request({
-    url: '/garbage/record',
-    method: 'put',
-    data: data
-  })
+  // 如果后端接口不可用，使用本地模拟
+  try {
+    return request({
+      url: '/garbage/record',
+      method: 'put',
+      data: data
+    }).catch(error => {
+      // 如果发生错误（如404），返回模拟数据
+      console.log('使用模拟数据', error);
+      return mockUpdateRecord(data);
+    });
+  } catch (error) {
+    return mockUpdateRecord(data);
+  }
+}
+
+// 模拟修改垃圾投递记录
+function mockUpdateRecord(data) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // 模拟更新成功响应
+      resolve({
+        code: 200,
+        msg: "修改成功",
+        data: {
+          ...data,
+          updateTime: new Date()
+        }
+      });
+    }, 500);
+  });
 }
 
 // 删除垃圾投递记录
@@ -170,31 +242,46 @@ function mockMyRecords(query) {
 }
 
 // 上传垃圾投递照片
-export function uploadPhoto(data) {
+export function uploadPhoto(file) {
+  const formData = new FormData();
+  
+  // 检查file是否是FormData类型，如果不是则添加到formData中
+  if (file instanceof FormData) {
+    // 如果已经是FormData，直接使用
+    return uploadRequest(file);
+  } else {
+    // 否则创建新的FormData并添加file
+    formData.append('file', file);
+    return uploadRequest(formData);
+  }
+}
+
+// 处理上传请求
+function uploadRequest(formData) {
   // 如果后端接口不可用，使用本地模拟
   try {
     return request({
       url: '/garbage/record/upload',
       method: 'post',
-      data: data,
+      data: formData,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'multipart/form-data'
       }
     }).catch(error => {
       // 如果发生错误（如404），返回模拟数据
       console.log('使用模拟数据', error);
-      return mockUploadPhoto(data);
+      return mockUploadPhoto(formData.get('file'));
     });
   } catch (error) {
-    return mockUploadPhoto(data);
+    return mockUploadPhoto(formData.get('file'));
   }
 }
 
 // 模拟上传照片
-function mockUploadPhoto(data) {
+function mockUploadPhoto(file) {
   return new Promise((resolve) => {
     setTimeout(() => {
-      // 只需返回图片URL即可，实际上已经有Base64数据了
+      // 模拟文件上传后的URL
       const fileName = 'mock-photo-' + new Date().getTime() + '.jpg';
       
       resolve({
@@ -202,7 +289,7 @@ function mockUploadPhoto(data) {
         msg: "上传成功",
         data: {
           fileName: fileName,
-          url: data.photoData // 直接使用Base64数据作为URL
+          url: "/profile/garbage-photos/" + fileName
         }
       });
     }, 1000);

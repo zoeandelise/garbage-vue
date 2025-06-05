@@ -49,6 +49,16 @@ public class GarbageRecordServiceImpl implements IGarbageRecordService {
         // 设置积分未计算标志
         record.setPointsCalculated(false);
         
+        // 确保图片URL格式正确
+        if (record.getPhotoUrl() != null && !record.getPhotoUrl().isEmpty()) {
+            // 如果不是以http或https开头，并且不是以/profile开头，添加/profile前缀
+            if (!record.getPhotoUrl().startsWith("http://") && 
+                !record.getPhotoUrl().startsWith("https://") &&
+                !record.getPhotoUrl().startsWith("/profile/")) {
+                record.setPhotoUrl("/profile/" + record.getPhotoUrl());
+            }
+        }
+        
         // 保存记录
         GarbageRecord savedRecord = garbageRecordRepository.save(record);
         
@@ -110,6 +120,16 @@ public class GarbageRecordServiceImpl implements IGarbageRecordService {
         
         // 设置更新时间
         record.setUpdateTime(new Date());
+        
+        // 确保图片URL格式正确
+        if (record.getPhotoUrl() != null && !record.getPhotoUrl().isEmpty()) {
+            // 如果不是以http或https开头，并且不是以/profile开头，添加/profile前缀
+            if (!record.getPhotoUrl().startsWith("http://") && 
+                !record.getPhotoUrl().startsWith("https://") &&
+                !record.getPhotoUrl().startsWith("/profile/")) {
+                record.setPhotoUrl("/profile/" + record.getPhotoUrl());
+            }
+        }
         
         // 保存记录
         return garbageRecordRepository.save(record);

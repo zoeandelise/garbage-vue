@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ruoyi.common.annotation.Anonymous;
+import com.ruoyi.common.constant.HttpStatus;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.garbage.domain.GarbageGuide;
 import com.ruoyi.garbage.service.IGarbageGuideService;
 
@@ -41,19 +43,48 @@ public class GarbageGuideController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('garbage:guide:list')")
     @GetMapping("/list")
-    public AjaxResult list(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+    public TableDataInfo list(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                           @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
-                          @RequestParam(value = "garbageType", required = false) String garbageType) {
-        Pageable pageable = PageRequest.of(pageNum - 1, pageSize, Sort.by(Sort.Direction.ASC, "garbageName"));
+                          @RequestParam(value = "garbageType", required = false) String garbageType,
+                          @RequestParam(value = "garbageName", required = false) String garbageName) {
+        Pageable pageable = PageRequest.of(pageNum - 1, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
         
         Page<GarbageGuide> page;
-        if (garbageType != null && !garbageType.isEmpty()) {
+        
+        // 记录查询条件
+        System.out.println("查询垃圾指南列表 - 页码: " + pageNum + ", 每页数量: " + pageSize 
+                + ", 垃圾类型: " + garbageType + ", 垃圾名称: " + garbageName);
+        
+        // 根据条件查询
+        if (garbageName != null && !garbageName.isEmpty()) {
+            // 按名称模糊查询
+            page = garbageGuideService.searchGuidesByGarbageName(garbageName, pageable);
+        } else if (garbageType != null && !garbageType.isEmpty()) {
+            // 按类型查询
             page = garbageGuideService.getGuidesByType(garbageType, pageable);
         } else {
+            // 查询所有
             page = garbageGuideService.getAllGuides(pageable);
         }
         
-        return AjaxResult.success(page);
+        // 转换为前端需要的格式
+        List<GarbageGuide> list = page.getContent();
+        long total = page.getTotalElements();
+        
+        System.out.println("查询结果 - 总数: " + total + ", 当前页数据量: " + list.size());
+        // 打印更详细的数据内容，帮助排查问题
+        if (list.size() > 0) {
+            System.out.println("第一条数据: " + list.get(0).getGarbageName() + ", 类型: " + list.get(0).getGarbageType());
+        }
+        
+        // 直接返回TableDataInfo
+        TableDataInfo rspData = new TableDataInfo();
+        rspData.setCode(HttpStatus.SUCCESS);
+        rspData.setMsg("查询成功");
+        rspData.setRows(list);
+        rspData.setTotal(total);
+        
+        return rspData;
     }
 
     /**
@@ -62,7 +93,21 @@ public class GarbageGuideController extends BaseController {
     @PreAuthorize("@ss.hasPermi('garbage:guide:query')")
     @GetMapping("/{id}")
     public AjaxResult getInfo(@PathVariable("id") String id) {
-        return AjaxResult.success(garbageGuideService.getGuideById(id));
+        System.out.println("获取垃圾分类指南详情，ID: " + id);
+        try {
+            GarbageGuide guide = garbageGuideService.getGuideById(id);
+            if (guide != null) {
+                System.out.println("成功获取垃圾分类指南: " + guide.getGarbageName());
+                return AjaxResult.success(guide);
+            } else {
+                System.err.println("未找到ID为 " + id + " 的垃圾分类指南");
+                return AjaxResult.error("未找到指定的垃圾分类指南");
+            }
+        } catch (Exception e) {
+            System.err.println("获取垃圾分类指南详情出错: " + e.getMessage());
+            e.printStackTrace();
+            return AjaxResult.error("获取垃圾分类指南详情失败：" + e.getMessage());
+        }
     }
 
     /**
@@ -113,5 +158,25 @@ public class GarbageGuideController extends BaseController {
     public AjaxResult getAllTypes() {
         List<String> types = garbageGuideService.getAllGarbageTypes();
         return AjaxResult.success(types);
+    }
+    
+    /**
+     * 根据垃圾名称查询分类指南
+     */
+    @Anonymous
+    @GetMapping("/name/{garbageName}")
+    public AjaxResult getByName(@PathVariable("garbageName") String garbageName) {
+        GarbageGuide guide = garbageGuideService.getGuideByGarbageName(garbageName);
+        if (guide == null) {
+            // 如果找不到精确匹配，尝试模糊查询
+            List<GarbageGuide> guides = garbageGuideService.searchGuidesByGarbageName(garbageName);
+            if (guides != null && !guides.isEmpty()) {
+                // 返回第一个结果
+                return AjaxResult.success(guides.get(0));
+            }
+            // 如果仍然找不到，返回找不到的信息
+            return AjaxResult.error("未找到匹配的垃圾分类信息");
+        }
+        return AjaxResult.success(guide);
     }
 } 

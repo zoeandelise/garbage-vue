@@ -1,0 +1,62 @@
+{
+  "pages": [
+    "pages/home/index", 
+    "pages/guide/index", 
+    "pages/record/index", 
+    "pages/my/index",
+    "pages/my/info-edit/index",
+    "pages/points/index",
+    "pages/points/ranking",
+    "pages/search/index",
+    "pages/login/login",
+    "pages/register/index",
+    "pages/garbage/detail",
+    "pages/guide/detail",
+    "pages/guide/category",
+    "pages/guide/knowledge-list",
+    "pages/guide/knowledge",
+    "pages/record/upload",
+    "pages/record/history",
+    "pages/setting/index",
+    "pages/release/index",
+    "pages/message/index",
+    "pages/chat/index",
+    "pages/dataCenter/index",
+    "pages/loginCode/loginCode"
+  ],
+  "usingComponents": {
+    "t-toast": "tdesign-miniprogram/toast/toast",
+    "t-message": "tdesign-miniprogram/message/message"
+  },
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "城市垃圾分类",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "custom": true,
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/guide/index",
+        "text": "分类指南"
+      },
+      {
+        "pagePath": "pages/record/index",
+        "text": "投递记录"
+      },
+      {
+        "pagePath": "pages/my/index",
+        "text": "我的"
+      }
+    ]
+  },
+  "resolveAlias": {
+    "~/*": "/*"
+  },
+  "sitemapLocation": "sitemap.json"
+}
